@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Yönetim Sistemi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  :root {
+    --bg: #f4f6fa; --card: #ffffff; --ink: #1e2433; --muted: #6b7280;
+    --primary: #3b5bdb; --primary-dark: #2f4bc0; --danger: #dc3545; --ok: #198754;
+    --border: #e3e7ef; --radius: 10px;
+  }
+  body { background: var(--bg); color: var(--ink); min-height: 100vh; }
+  .hidden { display: none !important; }
+
+  /* ---------- Auth ekrani ---------- */
+  #authView { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+  .auth-card { background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(30,36,51,.08); padding: 32px; width: 100%; max-width: 400px; }
+  .auth-card h1 { font-size: 22px; margin-bottom: 4px; }
+  .auth-card p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tabs button { flex: 1; padding: 10px; border: 1px solid var(--border); background: var(--card); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .tabs button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; }
+  textarea { resize: vertical; min-height: 70px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+
+  .btn { display: inline-block; padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: var(--primary); color: #fff; }
+  .btn:hover { background: var(--primary-dark); }
+  .btn.full { width: 100%; margin-top: 18px; }
+  .btn.ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+  .btn.danger { background: var(--danger); }
+  .btn.small { padding: 6px 10px; font-size: 12px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ---------- Ana ekran ---------- */
+  header { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 5; }
+  header .brand { font-weight: 700; font-size: 17px; }
+  header .who { font-size: 13px; color: var(--muted); }
+  header .who b { color: var(--ink); }
+  nav { display: flex; gap: 6px; flex-wrap: wrap; }
+  nav button { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+  nav button.active { background: var(--primary); color: #fff; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+  .card h2 { font-size: 17px; margin-bottom: 12px; }
+
+  /* Dashboard */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .stat .num { font-size: 28px; font-weight: 700; color: var(--primary); }
+  .stat .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Ticket listesi */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+  .filters > div { flex: 1; min-width: 130px; }
+  .ticket { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; background: var(--card); }
+  .ticket .top { display: flex; justify-content: space-between; align-items: start; gap: 10px; flex-wrap: wrap; }
+  .ticket h3 { font-size: 15px; }
+  .ticket .desc { color: var(--muted); font-size: 13px; margin: 6px 0 10px; }
+  .ticket .meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+  .b-OPEN { background: #e7f0ff; color: #2b5bd7; }
+  .b-IN_PROGRESS { background: #fff3cd; color: #9a6b00; }
+  .b-DONE { background: #d1e7dd; color: #14653c; }
+  .b-LOW { background: #eef1f5; color: #566173; }
+  .b-MEDIUM { background: #e2ecff; color: #3b5bdb; }
+  .b-HIGH { background: #fde2e4; color: #b02a37; }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 14px; }
+  .pager span { font-size: 13px; color: var(--muted); }
+
+  /* Yorumlar */
+  .comments { margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 12px; }
+  .comment { background: var(--bg); border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; }
+  .comment b { font-size: 12px; }
+  .comment .when { color: var(--muted); font-size: 11px; }
+  .comment-form { display: flex; gap: 8px; margin-top: 8px; }
+  .comment-form input { flex: 1; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: 12px; }
+  .table-wrap { overflow-x: auto; }
+
+  /* Bildirim */
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,.2); z-index: 50; max-width: 90vw; }
+  #toast.err { background: var(--danger); }
+  #toast.ok { background: var(--ok); }
+
+  /* Modal */
+  .modal-bg { position: fixed; inset: 0; background: rgba(20,25,40,.45); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .modal { background: var(--card); border-radius: var(--radius); padding: 22px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+  .modal h2 { margin-bottom: 6px; }
+
+  @media (max-width: 600px) {
+    header { padding: 10px 12px; }
+    .ticket .top { flex-direction: column; }
+    .filters > div { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== GIRIS / KAYIT ==================== -->
+<div id="authView">
+  <div class="auth-card">
+    <h1>🎫 Ticket Yönetim Sistemi</h1>
+    <p>Devam etmek için giriş yapın veya kayıt olun.</p>
+    <div class="tabs">
+      <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Giriş</button>
+      <button id="tabRegister" onclick="switchAuthTab('register')">Kayıt Ol</button>
+    </div>
+    <form id="loginForm" onsubmit="doLogin(event)">
+      <label>Kullanıcı adı</label>
+      <input id="loginUsername" required autocomplete="username">
+      <label>Şifre</label>
+      <input id="loginPassword" type="password" required autocomplete="current-password">
+      <button class="btn full" type="submit">Giriş Yap</button>
+      <p style="margin-top:12px;font-size:12px;color:var(--muted)">Demo admin: <b>admin / admin123</b></p>
+    </form>
+    <form id="registerForm" class="hidden" onsubmit="doRegister(event)">
+      <label>Kullanıcı adı</label>
+      <input id="regUsername" required minlength="3">
+      <label>Email</label>
+      <input id="regEmail" type="email" required>
+      <label>Şifre (en az 6 karakter)</label>
+      <input id="regPassword" type="password" required minlength="6">
+      <button class="btn full" type="submit">Kayıt Ol</button>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== ANA EKRAN ==================== -->
+<div id="appView" class="hidden">
+  <header>
+    <div>
+      <div class="brand">🎫 Ticket Yönetimi</div>
+      <div class="who"><b id="whoName"></b> · <span id="whoRole"></span></div>
+    </div>
+    <nav>
+      <button id="navDashboard" class="active" onclick="showPage('dashboard')">Dashboard</button>
+      <button id="navTickets" onclick="showPage('tickets')">Ticket'lar</button>
+      <button id="navUsers" class="hidden" onclick="showPage('users')">Kullanıcılar</button>
+      <button id="navAudit" class="hidden" onclick="showPage('audit')">Loglar</button>
+      <button onclick="logout()" style="color:var(--danger)">Çıkış</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Dashboard -->
+    <section id="pageDashboard">
+      <div class="stats" id="statCards"></div>
+      <div class="card" style="margin-top:14px">
+        <h2>Son 5 Ticket</h2>
+        <div id="lastTickets"></div>
+      </div>
+    </section>
+
+    <!-- Ticketlar -->
+    <section id="pageTickets" class="hidden">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <h2 style="margin:0">Ticket'lar</h2>
+          <button class="btn" onclick="openTicketModal()">+ Yeni Ticket</button>
+        </div>
+        <div class="filters" style="margin-top:14px">
+          <div><label>Status</label>
+            <select id="fStatus" onchange="state.page=0;loadTickets()">
+              <option value="">Hepsi</option><option>OPEN</option><option>IN_PROGRESS</option><option>DONE</option>
+            </select></div>
+          <div><label>Öncelik</label>
+            <select id="fPriority" onchange="state.page=0;loadTickets()">
+              <option value="">Hepsi</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
+            </select></div>
+        </div>
+        <div id="ticketList"></div>
+        <div class="pager">
+          <button class="btn small ghost" id="prevBtn" onclick="state.page--;loadTickets()">‹ Önceki</button>
+          <span id="pageInfo"></span>
+          <button class="btn small ghost" id="nextBtn" onclick="state.page++;loadTickets()">Sonraki ›</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kullanicilar (admin) -->
+    <section id="pageUsers" class="hidden">
+      <div class="card"><h2>Kullanıcılar</h2>
+        <div class="table-wrap"><table id="userTable"></table></div>
+      </div>
+    </section>
+
+    <!-- Audit log (admin) -->
+    <section id="pageAudit" class="hidden">
+      <div class="card"><h2>Audit Log</h2>
+        <div class="table-wrap"><table id="auditTable"></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Ticket olustur/duzenle modali -->
+<div id="ticketModal" class="modal-bg hidden" onclick="if(event.target===this)closeTicketModal()">
+  <div class="modal">
+    <h2 id="modalTitle">Yeni Ticket</h2>
+    <form onsubmit="saveTicket(event)">
+      <label>Başlık</label>
+      <input id="tTitle" required maxlength="200">
+      <label>Açıklama</label>
+      <textarea id="tDesc" required maxlength="2000"></textarea>
+      <label>Öncelik</label>
+      <select id="tPriority"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option></select>
+      <label>Atanacak kullanıcı ID (opsiyonel)</label>
+      <input id="tAssigned" type="number" min="1" placeholder="örn: 2">
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button class="btn" type="submit" style="flex:1">Kaydet</button>
+        <button class="btn ghost" type="button" onclick="closeTicketModal()">Vazgeç</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+const state = { token: null, username: null, role: null, page: 0, totalPages: 0, editingId: null, openComments: new Set() };
+
+/* ---------- yardimcilar ---------- */
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, type) {
+  const old = $('toast'); if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'toast'; el.className = type || ''; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+async function api(path, options = {}) {
+  options.headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers);
+  if (state.token) options.headers['Authorization'] = 'Bearer ' + state.token;
+  const res = await fetch(API + path, options);
+  if (res.status === 204) return null;
+  let body = null;
+  try { body = await res.json(); } catch (e) { /* bos govde */ }
+  if (!res.ok) {
+    let msg = (body && body.message) || ('Hata: HTTP ' + res.status);
+    if (body && body.fieldErrors) msg += ' — ' + Object.values(body.fieldErrors).join(', ');
+    throw new Error(msg);
+  }
+  return body;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '-';
+  return new Date(iso).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/* ---------- auth ---------- */
+function switchAuthTab(tab) {
+  $('tabLogin').classList.toggle('active', tab === 'login');
+  $('tabRegister').classList.toggle('active', tab === 'register');
+  $('loginForm').classList.toggle('hidden', tab !== 'login');
+  $('registerForm').classList.toggle('hidden', tab !== 'register');
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  try {
+    const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username: $('loginUsername').value, password: $('loginPassword').value }) });
+    startSession(data);
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function doRegister(e) {
+  e.preventDefault();
+  try {
+    const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ username: $('regUsername').value, email: $('regEmail').value, password: $('regPassword').value }) });
+    toast('Kayıt başarılı, hoş geldin!', 'ok');
+    startSession(data);
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+function startSession(data) {
+  state.token = data.token; state.username = data.username; state.role = data.role;
+  sessionStorage.setItem('tms', JSON.stringify({ token: data.token, username: data.username, role: data.role }));
+  $('authView').classList.add('hidden');
+  $('appView').classList.remove('hidden');
+  $('whoName').textContent = state.username;
+  $('whoRole').textContent = state.role;
+  const isAdmin = state.role === 'ADMIN';
+  $('navUsers').classList.toggle('hidden', !isAdmin);
+  $('navAudit').classList.toggle('hidden', !isAdmin);
+  showPage('dashboard');
+}
+
+function logout() {
+  sessionStorage.removeItem('tms');
+  state.token = state.username = state.role = null;
+  $('appView').classList.add('hidden');
+  $('authView').classList.remove('hidden');
+}
+
+/* ---------- sayfa gecisleri ---------- */
+function showPage(name) {
+  ['dashboard', 'tickets', 'users', 'audit'].forEach(p => {
+    $('page' + p[0].toUpperCase() + p.slice(1)).classList.toggle('hidden', p !== name);
+    const nav = $('nav' + p[0].toUpperCase() + p.slice(1));
+    if (nav) nav.classList.toggle('active', p === name);
+  });
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'tickets') loadTickets();
+  if (name === 'users') loadUsers();
+  if (name === 'audit') loadAudit();
+}
+
+/* ---------- dashboard ---------- */
+async function loadDashboard() {
+  try {
+    const d = await api('/dashboard');
+    let html = `<div class="stat"><div class="num">${d.totalTickets}</div><div class="lbl">Toplam Ticket</div></div>`;
+    for (const [status, count] of Object.entries(d.ticketsByStatus)) {
+      html += `<div class="stat"><div class="num">${count}</div><div class="lbl">${status}</div></div>`;
+    }
+    $('statCards').innerHTML = html;
+    $('lastTickets').innerHTML = d.lastFiveTickets.length
+      ? d.lastFiveTickets.map(t => ticketCard(t, true)).join('')
+      : '<p style="color:var(--muted);font-size:14px">Henüz ticket yok.</p>';
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+/* ---------- ticketlar ---------- */
+async function loadTickets() {
+  try {
+    const params = new URLSearchParams({ page: state.page, size: 5 });
+    if ($('fStatus').value) params.append('status', $('fStatus').value);
+    if ($('fPriority').value) params.append('priority', $('fPriority').value);
+    const d = await api('/tickets?' + params);
+    state.totalPages = d.totalPages;
+    $('ticketList').innerHTML = d.content.length
+      ? d.content.map(t => ticketCard(t)).join('')
+      : '<p style="color:var(--muted);font-size:14px;padding:10px 0">Gösterilecek ticket bulunamadı.</p>';
+    $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} (${d.totalElements} kayıt)` : '';
+    $('prevBtn').disabled = d.page <= 0;
+    $('nextBtn').disabled = d.page >= d.totalPages - 1;
+    for (const id of state.openComments) if (!$('cbox-' + id)) state.openComments.delete(id);
+    state.openComments.forEach(id => { if ($('cbox-' + id)) loadComments(id); });
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+function ticketCard(t, compact) {
+  const mine = t.createdBy === state.username;
+  const assignedToMe = t.assignedTo === state.username;
+  const isAdmin = state.role === 'ADMIN';
+  let actions = '';
+  if (!compact) {
+    if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">▶ Başlat (IN_PROGRESS)</button>`;
+    if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">✔ Bitir (DONE)</button>`;
+    if (mine) actions += `<button class="btn small ghost" onclick='openTicketModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'>Düzenle</button>`;
+    if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
+    actions += `<button class="btn small ghost" onclick="toggleComments(${t.id})">💬 Yorumlar</button>`;
+  }
+  return `
+  <div class="ticket">
+    <div class="top">
+      <h3>#${t.id} — ${esc(t.title)}</h3>
+      <div class="badges"><span class="badge b-${t.status}">${t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
+    </div>
+    <div class="desc">${esc(t.description)}</div>
+    <div class="meta">Oluşturan: <b>${esc(t.createdBy)}</b> · Atanan: <b>${esc(t.assignedTo || '-')}</b> · Oluşturma: ${fmtDate(t.createdDate)} · Güncelleme: ${fmtDate(t.updatedDate)}</div>
+    <div class="actions">${actions}</div>
+    <div id="cbox-${t.id}" class="comments hidden">
+      <div id="clist-${t.id}"></div>
+      <form class="comment-form" onsubmit="addComment(event,${t.id})">
+        <input id="cinput-${t.id}" placeholder="Yorum yaz..." required>
+        <button class="btn small" type="submit">Gönder</button>
+      </form>
+    </div>
+  </div>`;
+}
+
+async function changeStatus(id, status) {
+  try {
+    await api(`/tickets/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    toast('Status güncellendi: ' + status, 'ok');
+    loadTickets();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function deleteTicket(id) {
+  if (!confirm('#' + id + ' numaralı ticket silinsin mi?')) return;
+  try {
+    await api('/tickets/' + id, { method: 'DELETE' });
+    toast('Ticket silindi', 'ok');
+    loadTickets();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+/* ---------- ticket olustur / duzenle ---------- */
+function openTicketModal(t) {
+  state.editingId = t ? t.id : null;
+  $('modalTitle').textContent = t ? ('#' + t.id + ' Düzenle') : 'Yeni Ticket';
+  $('tTitle').value = t ? t.title : '';
+  $('tDesc').value = t ? t.description : '';
+  $('tPriority').value = t ? t.priority : 'MEDIUM';
+  $('tAssigned').value = '';
+  $('ticketModal').classList.remove('hidden');
+}
+
+function closeTicketModal() { $('ticketModal').classList.add('hidden'); }
+
+async function saveTicket(e) {
+  e.preventDefault();
+  const body = { title: $('tTitle').value, description: $('tDesc').value, priority: $('tPriority').value };
+  const assigned = $('tAssigned').value;
+  if (assigned) body.assignedToId = parseInt(assigned, 10);
+  try {
+    if (state.editingId) {
+      await api('/tickets/' + state.editingId, { method: 'PUT', body: JSON.stringify(body) });
+      toast('Ticket güncellendi', 'ok');
+    } else {
+      await api('/tickets', { method: 'POST', body: JSON.stringify(body) });
+      toast('Ticket oluşturuldu (status: OPEN)', 'ok');
+    }
+    closeTicketModal();
+    showPage('tickets');
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+/* ---------- yorumlar ---------- */
+function toggleComments(id) {
+  const box = $('cbox-' + id);
+  const willOpen = box.classList.contains('hidden');
+  box.classList.toggle('hidden');
+  if (willOpen) { state.openComments.add(id); loadComments(id); }
+  else state.openComments.delete(id);
+}
+
+async function loadComments(id) {
+  try {
+    const list = await api(`/tickets/${id}/comments`);
+    $('clist-' + id).innerHTML = list.length
+      ? list.map(c => `<div class="comment"><b>${esc(c.author)}</b> <span class="when">${fmtDate(c.createdDate)}</span><br>${esc(c.content)}</div>`).join('')
+      : '<p style="color:var(--muted);font-size:12px;margin-bottom:6px">Henüz yorum yok.</p>';
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function addComment(e, id) {
+  e.preventDefault();
+  try {
+    await api(`/tickets/${id}/comments`, { method: 'POST', body: JSON.stringify({ content: $('cinput-' + id).value }) });
+    $('cinput-' + id).value = '';
+    loadComments(id);
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+/* ---------- admin sayfalari ---------- */
+async function loadUsers() {
+  try {
+    const users = await api('/users');
+    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı adı</th><th>Email</th><th>Rol</th></tr>' +
+      users.map(u => `<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${esc(u.email)}</td><td>${u.role}</td></tr>`).join('');
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function loadAudit() {
+  try {
+    const logs = await api('/audit-logs');
+    $('auditTable').innerHTML = '<tr><th>Zaman</th><th>İşlem</th><th>Kullanıcı</th><th>Ticket</th><th>Detay</th></tr>' +
+      logs.map(l => `<tr><td>${fmtDate(l.timestamp)}</td><td>${l.action}</td><td>${esc(l.username)}</td><td>${l.ticketId ?? '-'}</td><td>${esc(l.details)}</td></tr>`).join('');
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+/* ---------- oturumu hatirla ---------- */
+(function init() {
+  const saved = sessionStorage.getItem('tms');
+  if (saved) startSession(JSON.parse(saved));
+})();
+</script>
+</body>
+</html>
