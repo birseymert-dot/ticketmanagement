@@ -215,8 +215,8 @@
       <textarea id="tDesc" required maxlength="2000"></textarea>
       <label>Öncelik</label>
       <select id="tPriority"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option></select>
-      <label>Atanacak kullanıcı ID (opsiyonel)</label>
-      <input id="tAssigned" type="number" min="1" placeholder="örn: 2">
+      <label>Atanacak kullanıcı adı (opsiyonel)</label>
+      <input id="tAssigned" type="text" placeholder="örn: admin">
       <div style="display:flex;gap:8px;margin-top:18px">
         <button class="btn" type="submit" style="flex:1">Kaydet</button>
         <button class="btn ghost" type="button" onclick="closeTicketModal()">Vazgeç</button>
@@ -411,7 +411,7 @@ function openTicketModal(t) {
   $('tTitle').value = t ? t.title : '';
   $('tDesc').value = t ? t.description : '';
   $('tPriority').value = t ? t.priority : 'MEDIUM';
-  $('tAssigned').value = '';
+  $('tAssigned').value = t && t.assignedTo ? t.assignedTo : '';
   $('ticketModal').classList.remove('hidden');
 }
 
@@ -420,8 +420,8 @@ function closeTicketModal() { $('ticketModal').classList.add('hidden'); }
 async function saveTicket(e) {
   e.preventDefault();
   const body = { title: $('tTitle').value, description: $('tDesc').value, priority: $('tPriority').value };
-  const assigned = $('tAssigned').value;
-  if (assigned) body.assignedToId = parseInt(assigned, 10);
+  const assigned = $('tAssigned').value.trim();
+  if (assigned) body.assignedToUsername = assigned;
   try {
     if (state.editingId) {
       await api('/tickets/' + state.editingId, { method: 'PUT', body: JSON.stringify(body) });

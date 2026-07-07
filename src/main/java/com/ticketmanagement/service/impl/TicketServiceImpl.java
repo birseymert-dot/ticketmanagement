@@ -14,6 +14,7 @@ import com.ticketmanagement.model.enums.AuditAction;
 import com.ticketmanagement.model.enums.Role;
 import com.ticketmanagement.model.enums.TicketPriority;
 import com.ticketmanagement.model.enums.TicketStatus;
+import com.ticketmanagement.repository.CommentRepository;
 import com.ticketmanagement.repository.TicketRepository;
 import com.ticketmanagement.repository.UserRepository;
 import com.ticketmanagement.service.AuditLogService;
@@ -37,13 +38,16 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final AuditLogService auditLogService;
 
     public TicketServiceImpl(TicketRepository ticketRepository,
                              UserRepository userRepository,
+                             CommentRepository commentRepository,
                              AuditLogService auditLogService) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -60,9 +64,8 @@ public class TicketServiceImpl implements TicketService {
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedBy(creator);
 
-        if (request.getAssignedToId() != null) {
-            User assignee = userRepository.findById(request.getAssignedToId())
-                    .orElseThrow(() -> new NotFoundException("Atanacak kullanici bulunamadi: " + request.getAssignedToId()));
+        User assignee = resolveAssignee(request.getAssignedToId(), request.getAssignedToUsername());
+        if (assignee != null) {
             ticket.setAssignedTo(assignee);
         }
 
@@ -120,9 +123,8 @@ public class TicketServiceImpl implements TicketService {
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
 
-        if (request.getAssignedToId() != null) {
-            User assignee = userRepository.findById(request.getAssignedToId())
-                    .orElseThrow(() -> new NotFoundException("Atanacak kullanici bulunamadi: " + request.getAssignedToId()));
+        User assignee = resolveAssignee(request.getAssignedToId(), request.getAssignedToUsername());
+        if (assignee != null) {
             ticket.setAssignedTo(assignee);
         }
 
@@ -170,9 +172,28 @@ public class TicketServiceImpl implements TicketService {
         }
 
         Ticket ticket = findTicket(id);
+        // Once ticket'a bagli yorumlar silinir (foreign key kisiti nedeniyle)
+        commentRepository.deleteByTicketId(id);
         ticketRepository.delete(ticket);
         auditLogService.log(AuditAction.TICKET_DELETED, username, id,
                 "Ticket silindi: " + ticket.getTitle());
+    }
+
+    /**
+     * Atanacak kullaniciyi ID veya kullanici adi ile bulur.
+     * Ikisi de bos ise null doner (atama yapilmaz).
+     */
+    private User resolveAssignee(Long assignedToId, String assignedToUsername) {
+        if (assignedToId != null) {
+            return userRepository.findById(assignedToId)
+                    .orElseThrow(() -> new NotFoundException("Atanacak kullanici bulunamadi: " + assignedToId));
+        }
+        if (assignedToUsername != null && !assignedToUsername.trim().isEmpty()) {
+            String name = assignedToUsername.trim();
+            return userRepository.findByUsername(name)
+                    .orElseThrow(() -> new NotFoundException("Atanacak kullanici bulunamadi: " + name));
+        }
+        return null;
     }
 
     private User findUser(String username) {

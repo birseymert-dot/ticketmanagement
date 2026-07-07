@@ -25,6 +25,9 @@ public class TicketUpdateRequest {
 
     private Long assignedToId;
 
+    /** Opsiyonel: ID yerine kullanici adi ile atama (arayuz bu alani kullanir). */
+    private String assignedToUsername;
+
     public String getTitle() {
         return title;
     }
@@ -55,5 +58,13 @@ public class TicketUpdateRequest {
 
     public void setAssignedToId(Long assignedToId) {
         this.assignedToId = assignedToId;
+    }
+
+    public String getAssignedToUsername() {
+        return assignedToUsername;
+    }
+
+    public void setAssignedToUsername(String assignedToUsername) {
+        this.assignedToUsername = assignedToUsername;
     }
 }

@@ -11,6 +11,7 @@ import com.ticketmanagement.model.entity.User;
 import com.ticketmanagement.model.enums.Role;
 import com.ticketmanagement.model.enums.TicketPriority;
 import com.ticketmanagement.model.enums.TicketStatus;
+import com.ticketmanagement.repository.CommentRepository;
 import com.ticketmanagement.repository.TicketRepository;
 import com.ticketmanagement.repository.UserRepository;
 import com.ticketmanagement.service.impl.TicketServiceImpl;
@@ -48,6 +49,9 @@ class TicketServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
 
     @Mock
     private AuditLogService auditLogService;

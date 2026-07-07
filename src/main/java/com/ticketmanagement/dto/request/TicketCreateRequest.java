@@ -18,8 +18,11 @@ public class TicketCreateRequest {
     @NotNull(message = "Priority bos olamaz (LOW, MEDIUM, HIGH)")
     private TicketPriority priority;
 
-    /** Opsiyonel: ticket olusturulurken bir kullaniciya atanabilir. */
+    /** Opsiyonel: ticket olusturulurken bir kullaniciya ID ile atanabilir. */
     private Long assignedToId;
+
+    /** Opsiyonel: ID yerine kullanici adi ile atama (arayuz bu alani kullanir). */
+    private String assignedToUsername;
 
     public String getTitle() {
         return title;
@@ -51,5 +54,13 @@ public class TicketCreateRequest {
 
     public void setAssignedToId(Long assignedToId) {
         this.assignedToId = assignedToId;
+    }
+
+    public String getAssignedToUsername() {
+        return assignedToUsername;
+    }
+
+    public void setAssignedToUsername(String assignedToUsername) {
+        this.assignedToUsername = assignedToUsername;
     }
 }
