@@ -41,16 +41,19 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        String username = normalize(request.getUsername());
+        String email = normalize(request.getEmail());
+
+        if (userRepository.existsByUsername(username)) {
             throw new BadRequestException("Bu kullanici adi zaten kullaniliyor");
         }
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(email)) {
             throw new BadRequestException("Bu email zaten kullaniliyor");
         }
 
         User user = new User(
-                request.getUsername(),
-                request.getEmail(),
+                username,
+                email,
                 passwordEncoder.encode(request.getPassword()),
                 Role.USER
         );
@@ -62,15 +65,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
+        String username = normalize(request.getUsername());
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(username, request.getPassword()));
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BadRequestException("Kullanici bulunamadi"));
 
         auditLogService.log(AuditAction.LOGIN, user.getUsername(), null, "Kullanici giris yapti");
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
         return new AuthResponse(token, user.getUsername(), user.getRole());
+    }
+
+    private String normalize(String value) {
+        return value == null ? null : value.trim();
     }
 }

@@ -15,7 +15,6 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Sifre bos olamaz")
-    @Size(min = 6, message = "Sifre en az 6 karakter olmalidir")
     private String password;
 
     public String getUsername() {
@@ -23,7 +22,7 @@ public class RegisterRequest {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username != null ? username.trim() : null;
     }
 
     public String getEmail() {
@@ -31,7 +30,7 @@ public class RegisterRequest {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email != null ? email.trim() : null;
     }
 
     public String getPassword() {
