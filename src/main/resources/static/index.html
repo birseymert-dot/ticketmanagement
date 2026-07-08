@@ -216,7 +216,8 @@
       <label>Öncelik</label>
       <select id="tPriority"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option></select>
       <label>Atanacak kullanıcı adı (opsiyonel)</label>
-      <input id="tAssigned" type="text" placeholder="örn: admin">
+      <input id="tAssigned" type="text" list="userOptions" placeholder="örn: admin">
+      <datalist id="userOptions"></datalist>
       <div style="display:flex;gap:8px;margin-top:18px">
         <button class="btn" type="submit" style="flex:1">Kaydet</button>
         <button class="btn ghost" type="button" onclick="closeTicketModal()">Vazgeç</button>
@@ -345,6 +346,8 @@ async function loadTickets() {
     if ($('fPriority').value) params.append('priority', $('fPriority').value);
     const d = await api('/tickets?' + params);
     state.totalPages = d.totalPages;
+    state.ticketsById = {};
+    d.content.forEach(t => { state.ticketsById[t.id] = t; });
     $('ticketList').innerHTML = d.content.length
       ? d.content.map(t => ticketCard(t)).join('')
       : '<p style="color:var(--muted);font-size:14px;padding:10px 0">Gösterilecek ticket bulunamadı.</p>';
@@ -364,18 +367,19 @@ function ticketCard(t, compact) {
   if (!compact) {
     if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">▶ Başlat (IN_PROGRESS)</button>`;
     if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">✔ Bitir (DONE)</button>`;
-    if (mine) actions += `<button class="btn small ghost" onclick='openTicketModal(${JSON.stringify(t).replace(/'/g, "&#39;")})'>Düzenle</button>`;
+    if (mine) actions += `<button class="btn small ghost" onclick="openTicketModalById(${t.id})">✏ Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
-    actions += `<button class="btn small ghost" onclick="toggleComments(${t.id})">💬 Yorumlar</button>`;
+    actions += `<button class="btn small ghost" onclick="toggleComments(${t.id})">💬 Yorum yap</button>`;
   }
   return `
   <div class="ticket">
+    <div class="meta">👤 Oluşturan: <b>${esc(t.createdBy)}</b></div>
     <div class="top">
       <h3>#${t.id} — ${esc(t.title)}</h3>
       <div class="badges"><span class="badge b-${t.status}">${t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
     </div>
     <div class="desc">${esc(t.description)}</div>
-    <div class="meta">Oluşturan: <b>${esc(t.createdBy)}</b> · Atanan: <b>${esc(t.assignedTo || '-')}</b> · Oluşturma: ${fmtDate(t.createdDate)} · Güncelleme: ${fmtDate(t.updatedDate)}</div>
+    <div class="meta">Atanan: <b>${esc(t.assignedTo || '-')}</b> · Oluşturma: ${fmtDate(t.createdDate)} · Güncelleme: ${fmtDate(t.updatedDate)}</div>
     <div class="actions">${actions}</div>
     <div id="cbox-${t.id}" class="comments hidden">
       <div id="clist-${t.id}"></div>
@@ -385,6 +389,11 @@ function ticketCard(t, compact) {
       </form>
     </div>
   </div>`;
+}
+
+function openTicketModalById(id) {
+  const t = state.ticketsById ? state.ticketsById[id] : null;
+  if (t) openTicketModal(t);
 }
 
 async function changeStatus(id, status) {
@@ -412,7 +421,26 @@ function openTicketModal(t) {
   $('tDesc').value = t ? t.description : '';
   $('tPriority').value = t ? t.priority : 'MEDIUM';
   $('tAssigned').value = t && t.assignedTo ? t.assignedTo : '';
+  fillUserOptions();
   $('ticketModal').classList.remove('hidden');
+}
+
+/* Atama kutusu icin kisi onerileri:
+   ADMIN tum kullanicilari gorur; USER liste cekemedigi icin
+   ekranindaki ticket'larda gecen isimlerden oneri olusturulur. */
+async function fillUserOptions() {
+  let names = new Set([state.username]);
+  if (state.role === 'ADMIN') {
+    try {
+      (await api('/users')).forEach(u => names.add(u.username));
+    } catch (e) { /* oneri dolmasa da form calisir */ }
+  } else if (state.ticketsById) {
+    Object.values(state.ticketsById).forEach(t => {
+      if (t.createdBy) names.add(t.createdBy);
+      if (t.assignedTo) names.add(t.assignedTo);
+    });
+  }
+  $('userOptions').innerHTML = [...names].map(n => `<option value="${esc(n)}">`).join('');
 }
 
 function closeTicketModal() { $('ticketModal').classList.add('hidden'); }
