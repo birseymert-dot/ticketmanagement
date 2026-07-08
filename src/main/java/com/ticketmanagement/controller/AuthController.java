@@ -3,6 +3,7 @@ package com.ticketmanagement.controller;
 import com.ticketmanagement.dto.request.LoginRequest;
 import com.ticketmanagement.dto.request.RegisterRequest;
 import com.ticketmanagement.dto.response.AuthResponse;
+import com.ticketmanagement.dto.response.RegisterResponse;
 import com.ticketmanagement.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 

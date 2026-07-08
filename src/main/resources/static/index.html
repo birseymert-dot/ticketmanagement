@@ -262,8 +262,8 @@
       <input id="regUsername" required minlength="3">
       <label>E-posta</label>
       <input id="regEmail" type="email" required>
-      <label>Şifre (en az 6 karakter)</label>
-      <input id="regPassword" type="password" required minlength="6">
+      <label>Şifre (en az 3 karakter, tamamen harf olamaz)</label>
+      <input id="regPassword" type="password" required minlength="3" pattern=".*[^A-Za-zÇĞİÖŞÜçğıöşü].*" title="Şifre en az 3 karakter olmalı ve en az bir rakam veya sembol içermelidir.">
       <button class="btn full" type="submit">Hesap Oluştur</button>
     </form>
   </div>
@@ -433,8 +433,13 @@ async function doRegister(e) {
   e.preventDefault();
   try {
     const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ username: $('regUsername').value, email: $('regEmail').value, password: $('regPassword').value }) });
-    toast('Kaydınız oluşturuldu.', 'ok');
-    startSession(data);
+    toast(data.message || 'Kayıt oluşturuldu. Giriş yapabilirsiniz.', 'ok');
+    $('loginUsername').value = data.username || $('regUsername').value.trim();
+    $('loginPassword').value = '';
+    $('regUsername').value = '';
+    $('regEmail').value = '';
+    $('regPassword').value = '';
+    switchAuthTab('login');
   } catch (err) { toast(err.message, 'err'); }
 }
 

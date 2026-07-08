@@ -86,7 +86,8 @@ Istenirse `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` ortam degiskenleriyle MySQL/Pos
 
 ## Guvenlik
 
-- Login/register JWT tabanlidir.
+- Register yeni USER kullanici olusturur, otomatik oturum acmaz.
+- Login JWT tabanlidir ve basarili giriste token uretir.
 - Sifreler BCrypt ile hashlenir.
 - JWT secret ortam degiskeniyle verilebilir: `JWT_SECRET`.
 - H2 console varsayilan olarak kapali gelir. Gerekirse local ortamda `H2_CONSOLE_ENABLED=true` ile acilabilir.
@@ -108,4 +109,3 @@ Calistirma:
 ```bash
 mvn test
 ```
-

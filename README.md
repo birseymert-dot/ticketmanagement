@@ -55,7 +55,7 @@ Register endpoint'i her zaman `USER` rolünde kullanıcı oluşturur.
 
 | Metot | Endpoint | Açıklama |
 |---|---|---|
-| POST | `/api/auth/register` | Kayıt (USER rolü) — 201 |
+| POST | `/api/auth/register` | Kayıt (USER rolü) — 201, otomatik giriş yapmaz |
 | POST | `/api/auth/login` | Giriş, JWT token döner |
 
 Diğer tüm endpoint'ler `Authorization: Bearer <token>` header'ı ister.
@@ -121,7 +121,7 @@ src/main/java/com/ticketmanagement/
 ├── controller/      Auth, Ticket, Comment, User, Dashboard, AuditLog
 ├── dto/
 │   ├── request/     Register, Login, TicketCreate, TicketUpdate, StatusUpdate, Comment
-│   └── response/    Auth, Ticket, Comment, User, Dashboard, Page
+│   └── response/    Auth, Register, Ticket, Comment, User, Dashboard, Page
 ├── exception/       GlobalExceptionHandler + özel exception'lar
 ├── model/
 │   ├── entity/      User, Ticket, Comment, AuditLog

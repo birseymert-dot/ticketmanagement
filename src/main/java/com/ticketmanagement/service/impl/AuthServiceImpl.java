@@ -3,6 +3,7 @@ package com.ticketmanagement.service.impl;
 import com.ticketmanagement.dto.request.LoginRequest;
 import com.ticketmanagement.dto.request.RegisterRequest;
 import com.ticketmanagement.dto.response.AuthResponse;
+import com.ticketmanagement.dto.response.RegisterResponse;
 import com.ticketmanagement.exception.BadRequestException;
 import com.ticketmanagement.model.entity.User;
 import com.ticketmanagement.model.enums.AuditAction;
@@ -40,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
         String username = normalize(request.getUsername());
         String email = normalize(request.getEmail());
 
@@ -59,8 +60,7 @@ public class AuthServiceImpl implements AuthService {
         );
         userRepository.save(user);
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-        return new AuthResponse(token, user.getUsername(), user.getRole());
+        return new RegisterResponse("Kayit olusturuldu. Giris yapabilirsiniz.", user.getUsername(), user.getRole());
     }
 
     @Override
