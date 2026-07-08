@@ -333,7 +333,7 @@ async function loadDashboard() {
     }
     $('statCards').innerHTML = html;
     $('lastTickets').innerHTML = d.lastFiveTickets.length
-      ? d.lastFiveTickets.map(t => ticketCard(t, true)).join('')
+      ? d.lastFiveTickets.map(t => ticketCard(t, 'd')).join('')
       : '<p style="color:var(--muted);font-size:14px">Henüz ticket yok.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
@@ -349,17 +349,26 @@ async function loadTickets() {
     state.ticketsById = {};
     d.content.forEach(t => { state.ticketsById[t.id] = t; });
     $('ticketList').innerHTML = d.content.length
-      ? d.content.map(t => ticketCard(t)).join('')
+      ? d.content.map(t => ticketCard(t, 't')).join('')
       : '<p style="color:var(--muted);font-size:14px;padding:10px 0">Gösterilecek ticket bulunamadı.</p>';
     $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} (${d.totalElements} kayıt)` : '';
     $('prevBtn').disabled = d.page <= 0;
     $('nextBtn').disabled = d.page >= d.totalPages - 1;
-    for (const id of state.openComments) if (!$('cbox-' + id)) state.openComments.delete(id);
-    state.openComments.forEach(id => { if ($('cbox-' + id)) loadComments(id); });
+    for (const key of [...state.openComments]) {
+      if (!$('cbox-' + key)) { state.openComments.delete(key); continue; }
+      const [ctx, id] = key.split('-');
+      loadComments(ctx, id);
+    }
   } catch (err) { toast(err.message, 'err'); }
 }
 
-function ticketCard(t, compact) {
+/* ctx: 't' = Ticket'lar sayfasi, 'd' = Dashboard.
+   Ayni ticket iki sayfada da gorunebildigi icin yorum kutusu
+   kimlikleri ctx ile ayristirilir — aksi halde kutu yanlis
+   sayfadaki (gizli) kopyada acilir ve calismiyor sanilir. */
+function ticketCard(t, ctx) {
+  ctx = ctx || 't';
+  const compact = ctx === 'd';
   const mine = t.createdBy === state.username;
   const assignedToMe = t.assignedTo === state.username;
   const isAdmin = state.role === 'ADMIN';
@@ -369,8 +378,9 @@ function ticketCard(t, compact) {
     if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">✔ Bitir (DONE)</button>`;
     if (mine) actions += `<button class="btn small ghost" onclick="openTicketModalById(${t.id})">✏ Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
-    actions += `<button class="btn small ghost" onclick="toggleComments(${t.id})">💬 Yorum yap</button>`;
   }
+  actions += `<button class="btn small ghost" onclick="toggleComments('${ctx}',${t.id})">💬 Yorum yap</button>`;
+  const key = ctx + '-' + t.id;
   return `
   <div class="ticket">
     <div class="meta">👤 Oluşturan: <b>${esc(t.createdBy)}</b></div>
@@ -381,10 +391,10 @@ function ticketCard(t, compact) {
     <div class="desc">${esc(t.description)}</div>
     <div class="meta">Atanan: <b>${esc(t.assignedTo || '-')}</b> · Oluşturma: ${fmtDate(t.createdDate)} · Güncelleme: ${fmtDate(t.updatedDate)}</div>
     <div class="actions">${actions}</div>
-    <div id="cbox-${t.id}" class="comments hidden">
-      <div id="clist-${t.id}"></div>
-      <form class="comment-form" onsubmit="addComment(event,${t.id})">
-        <input id="cinput-${t.id}" placeholder="Yorum yaz..." required>
+    <div id="cbox-${key}" class="comments hidden">
+      <div id="clist-${key}"></div>
+      <form class="comment-form" onsubmit="addComment(event,'${ctx}',${t.id})">
+        <input id="cinput-${key}" placeholder="Yorum yaz..." required>
         <button class="btn small" type="submit">Gönder</button>
       </form>
     </div>
@@ -464,29 +474,32 @@ async function saveTicket(e) {
 }
 
 /* ---------- yorumlar ---------- */
-function toggleComments(id) {
-  const box = $('cbox-' + id);
+function toggleComments(ctx, id) {
+  const key = ctx + '-' + id;
+  const box = $('cbox-' + key);
   const willOpen = box.classList.contains('hidden');
   box.classList.toggle('hidden');
-  if (willOpen) { state.openComments.add(id); loadComments(id); }
-  else state.openComments.delete(id);
+  if (willOpen) { state.openComments.add(key); loadComments(ctx, id); }
+  else state.openComments.delete(key);
 }
 
-async function loadComments(id) {
+async function loadComments(ctx, id) {
   try {
     const list = await api(`/tickets/${id}/comments`);
-    $('clist-' + id).innerHTML = list.length
+    $('clist-' + ctx + '-' + id).innerHTML = list.length
       ? list.map(c => `<div class="comment"><b>${esc(c.author)}</b> <span class="when">${fmtDate(c.createdDate)}</span><br>${esc(c.content)}</div>`).join('')
       : '<p style="color:var(--muted);font-size:12px;margin-bottom:6px">Henüz yorum yok.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
 
-async function addComment(e, id) {
+async function addComment(e, ctx, id) {
   e.preventDefault();
+  const input = $('cinput-' + ctx + '-' + id);
   try {
-    await api(`/tickets/${id}/comments`, { method: 'POST', body: JSON.stringify({ content: $('cinput-' + id).value }) });
-    $('cinput-' + id).value = '';
-    loadComments(id);
+    await api(`/tickets/${id}/comments`, { method: 'POST', body: JSON.stringify({ content: input.value }) });
+    input.value = '';
+    loadComments(ctx, id);
+    toast('Yorum eklendi', 'ok');
   } catch (err) { toast(err.message, 'err'); }
 }
 
