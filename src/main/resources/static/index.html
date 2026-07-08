@@ -308,7 +308,10 @@
     <section id="pageTickets" class="hidden">
       <div class="page-head">
         <div class="page-title">Ticket'lar</div>
-        <button class="btn" onclick="openTicketModal()">Yeni Ticket</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn secondary" onclick="resetTicketFilters()">Yenile</button>
+          <button class="btn" onclick="openTicketModal()">Yeni Ticket</button>
+        </div>
       </div>
       <div class="card">
         <div class="filters">
@@ -445,7 +448,7 @@ function startSession(data) {
   const isAdmin = state.role === 'ADMIN';
   $('navUsers').classList.toggle('hidden', !isAdmin);
   $('navAudit').classList.toggle('hidden', !isAdmin);
-  showPage('dashboard');
+  showPage(isAdmin ? 'dashboard' : 'tickets');
 }
 
 function logout() {
@@ -492,6 +495,10 @@ async function loadTickets() {
     if ($('fStatus').value) params.append('status', $('fStatus').value);
     if ($('fPriority').value) params.append('priority', $('fPriority').value);
     const d = await api('/tickets?' + params);
+    if (d.content.length === 0 && d.totalElements > 0 && state.page > 0) {
+      state.page = 0;
+      return loadTickets();
+    }
     state.totalPages = d.totalPages;
     state.ticketsById = {};
     d.content.forEach(t => { state.ticketsById[t.id] = t; });
@@ -507,6 +514,13 @@ async function loadTickets() {
       loadComments(ctx, id);
     }
   } catch (err) { toast(err.message, 'err'); }
+}
+
+function resetTicketFilters() {
+  $('fStatus').value = '';
+  $('fPriority').value = '';
+  state.page = 0;
+  loadTickets();
 }
 
 /* ctx: 't' = Ticket'lar sayfasi, 'd' = Genel Bakis.
@@ -529,7 +543,7 @@ function ticketCard(t, ctx) {
   // Genel Bakis'ta yorum butonu ticket'i olusturana gosterilmez —
   // olusturan kisi zaten Ticket'lar sayfasindan yorum yazabilir.
   const yorumGoster = compact ? !mine : true;
-  if (yorumGoster) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorumlar</button>`;
+  if (yorumGoster) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorum yap</button>`;
   const key = ctx + '-' + t.id;
   return `
   <div class="ticket">
@@ -561,7 +575,9 @@ async function changeStatus(id, status) {
   try {
     await api(`/tickets/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
     toast('Durum güncellendi: ' + (STATUS_TR[status] || status), 'ok');
+    state.page = 0;
     loadTickets();
+    loadDashboard();
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -570,7 +586,9 @@ async function deleteTicket(id) {
   try {
     await api('/tickets/' + id, { method: 'DELETE' });
     toast('Ticket silindi.', 'ok');
+    state.page = 0;
     loadTickets();
+    loadDashboard();
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -620,7 +638,9 @@ async function saveTicket(e) {
       toast('Ticket oluşturuldu.', 'ok');
     }
     closeTicketModal();
+    state.page = 0;
     showPage('tickets');
+    loadDashboard();
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -650,6 +670,7 @@ async function addComment(e, ctx, id) {
     await api(`/tickets/${id}/comments`, { method: 'POST', body: JSON.stringify({ content: input.value }) });
     input.value = '';
     loadComments(ctx, id);
+    loadDashboard();
     toast('Yorum eklendi.', 'ok');
   } catch (err) { toast(err.message, 'err'); }
 }
