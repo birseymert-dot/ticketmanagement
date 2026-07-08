@@ -190,7 +190,7 @@ public class TicketServiceImpl implements TicketService {
         }
         if (assignedToUsername != null && !assignedToUsername.trim().isEmpty()) {
             String name = assignedToUsername.trim();
-            return userRepository.findByUsername(name)
+            return userRepository.findByUsernameIgnoreCase(name)
                     .orElseThrow(() -> new NotFoundException("Atanacak kullanici bulunamadi: " + name));
         }
         return null;

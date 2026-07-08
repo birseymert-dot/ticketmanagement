@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 @Service
@@ -53,15 +54,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        String username = normalize(request.getUsername());
-        String email = normalize(request.getEmail());
+        String username = canonical(request.getUsername());
+        String email = canonical(request.getEmail());
 
         validateEmailFormat(email);
 
-        if (userRepository.existsByUsername(username)) {
+        // Benzersizlik kontrolleri buyuk/kucuk harf duyarsizdir:
+        // "Cansu" kayitliyken "cansu" ile ikinci hesap acilamaz.
+        if (userRepository.existsByUsernameIgnoreCase(username)) {
             throw new BadRequestException("Bu kullanici adi zaten kullaniliyor");
         }
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new BadRequestException("Bu email zaten kullaniliyor");
         }
 
@@ -82,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, request.getPassword()));
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new BadRequestException("Kullanici bulunamadi"));
 
         auditLogService.log(AuditAction.LOGIN, user.getUsername(), null, "Kullanici giris yapti");
@@ -93,6 +96,15 @@ public class AuthServiceImpl implements AuthService {
 
     private String normalize(String value) {
         return value == null ? null : value.trim();
+    }
+
+    /**
+     * Kullanici adi ve email kucuk harfe sabitlenerek saklanir.
+     * Boylece "Cansu" / "cansu" / "CANSU" ayni hesaba isaret eder ve
+     * Turkce buyuk-I donusumu kaynakli karsilastirma hatalari onlenir.
+     */
+    private String canonical(String value) {
+        return value == null ? null : value.trim().toLowerCase(Locale.ROOT);
     }
 
     /** Genel e-posta format dogrulamasi (is kurali, service katmaninda). */
