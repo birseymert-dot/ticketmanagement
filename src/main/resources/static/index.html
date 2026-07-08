@@ -5,230 +5,103 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ticket Yönetim Sistemi</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
   :root {
-    --bg: #f4f5f7;
-    --surface: #ffffff;
-    --ink: #1a202c;
-    --muted: #64748b;
-    --faint: #94a3b8;
-    --accent: #1e40af;
-    --accent-hover: #1a378f;
-    --accent-soft: #eef2ff;
-    --danger: #b91c1c;
-    --danger-soft: #fef2f2;
-    --success: #15803d;
-    --border: #e2e8f0;
-    --radius: 6px;
-    --shadow: 0 1px 2px rgba(16, 24, 40, .05);
+    --bg: #f4f6fa; --card: #ffffff; --ink: #1e2433; --muted: #6b7280;
+    --primary: #3b5bdb; --primary-dark: #2f4bc0; --danger: #dc3545; --ok: #198754;
+    --border: #e3e7ef; --radius: 10px;
   }
-  body {
-    font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg); color: var(--ink); min-height: 100vh;
-    font-size: 14px; line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+  body { background: var(--bg); color: var(--ink); min-height: 100vh; }
   .hidden { display: none !important; }
 
-  /* ---------- Marka ---------- */
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-mark {
-    width: 32px; height: 32px; border-radius: 6px; flex: none;
-    background: var(--accent); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 15px; letter-spacing: .5px;
-  }
-  .brand-name { font-weight: 600; font-size: 15px; letter-spacing: -.01em; }
-  .brand-sub { font-size: 11px; color: var(--muted); margin-top: -2px; }
+  /* ---------- Auth ekrani ---------- */
+  #authView { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+  .auth-card { background: var(--card); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(30,36,51,.08); padding: 32px; width: 100%; max-width: 400px; }
+  .auth-card h1 { font-size: 22px; margin-bottom: 4px; }
+  .auth-card p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tabs button { flex: 1; padding: 10px; border: 1px solid var(--border); background: var(--card); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .tabs button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-  /* ---------- Giris ekrani ---------- */
-  #authView { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
-  .auth-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    box-shadow: 0 4px 24px rgba(16, 24, 40, .06);
-    padding: 40px; width: 100%; max-width: 400px;
-  }
-  .auth-card .brand { margin-bottom: 8px; }
-  .auth-card > p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
-  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-  .tabs button {
-    flex: 1; padding: 10px 0; border: none; background: none; cursor: pointer;
-    font-size: 13px; font-weight: 600; color: var(--muted);
-    border-bottom: 2px solid transparent; margin-bottom: -1px;
-  }
-  .tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; }
+  textarea { resize: vertical; min-height: 70px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
 
-  label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin: 14px 0 5px; }
-  input, select, textarea {
-    width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: var(--radius);
-    font-size: 14px; font-family: inherit; background: var(--surface); color: var(--ink);
-    transition: border-color .12s, box-shadow .12s;
-  }
-  textarea { resize: vertical; min-height: 80px; }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(30, 64, 175, .12);
-  }
-  ::placeholder { color: var(--faint); }
+  .btn { display: inline-block; padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: var(--primary); color: #fff; }
+  .btn:hover { background: var(--primary-dark); }
+  .btn.full { width: 100%; margin-top: 18px; }
+  .btn.ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+  .btn.danger { background: var(--danger); }
+  .btn.small { padding: 6px 10px; font-size: 12px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
 
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 9px 16px; border: 1px solid transparent; border-radius: var(--radius);
-    font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
-    background: var(--accent); color: #fff; transition: background .12s, border-color .12s;
-  }
-  .btn:hover { background: var(--accent-hover); }
-  .btn.full { width: 100%; margin-top: 22px; }
-  .btn.secondary { background: var(--surface); color: #334155; border-color: #cbd5e1; }
-  .btn.secondary:hover { background: #f8fafc; border-color: var(--faint); }
-  .btn.danger { background: var(--surface); color: var(--danger); border-color: #fca5a5; }
-  .btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
-  .btn.small { padding: 6px 12px; font-size: 12px; }
-  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  /* ---------- Ana ekran ---------- */
+  header { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 5; }
+  header .brand { font-weight: 700; font-size: 17px; }
+  header .who { font-size: 13px; color: var(--muted); }
+  header .who b { color: var(--ink); }
+  nav { display: flex; gap: 6px; flex-wrap: wrap; }
+  nav button { padding: 8px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+  nav button.active { background: var(--primary); color: #fff; }
 
-  .auth-note {
-    margin-top: 16px; padding: 10px 12px; border-radius: var(--radius);
-    background: #f8fafc; border: 1px solid var(--border);
-    font-size: 12px; color: var(--muted);
-  }
-  .auth-note b { color: #334155; }
+  main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+  .card h2 { font-size: 17px; margin-bottom: 12px; }
 
-  /* ---------- Uygulama cercevesi ---------- */
-  header {
-    background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 10; min-height: 58px;
-  }
-  nav { display: flex; gap: 2px; align-self: stretch; align-items: stretch; }
-  nav button {
-    padding: 0 16px; border: none; background: none; cursor: pointer;
-    font-size: 13px; font-weight: 600; font-family: inherit; color: var(--muted);
-    border-bottom: 2px solid transparent;
-  }
-  nav button:hover { color: var(--ink); }
-  nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .header-right { display: flex; align-items: center; gap: 16px; }
-  .who { text-align: right; line-height: 1.3; }
-  .who .who-name { font-size: 13px; font-weight: 600; }
-  .who .who-role { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
-  .logout-btn {
-    padding: 7px 14px; border: 1px solid #cbd5e1; border-radius: var(--radius);
-    background: var(--surface); color: #334155; font-size: 12px; font-weight: 600;
-    font-family: inherit; cursor: pointer;
-  }
-  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+  /* Dashboard */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .stat .num { font-size: 28px; font-weight: 700; color: var(--primary); }
+  .stat .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-  main { max-width: 1080px; margin: 0 auto; padding: 28px 24px 72px; }
-  .page-title { font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
-  .page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
-
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; box-shadow: var(--shadow); padding: 22px;
-  }
-  .card + .card { margin-top: 16px; }
-  .card h2 { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 14px; }
-
-  /* ---------- Dashboard ---------- */
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 16px; }
-  .stat {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    box-shadow: var(--shadow); padding: 18px 20px;
-  }
-  .stat .lbl { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .stat .num { font-size: 26px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
-
-  /* ---------- Ticket listesi ---------- */
-  .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
-  .filters > div { flex: 1; min-width: 160px; max-width: 240px; }
-  .filters label { margin-top: 0; }
-
-  .ticket {
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 16px 18px; background: var(--surface);
-  }
-  .ticket + .ticket { margin-top: 10px; }
-  .ticket .creator { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .ticket .creator b { color: #334155; font-weight: 600; }
-  .ticket .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-  .ticket h3 { font-size: 14.5px; font-weight: 600; letter-spacing: -.01em; }
-  .ticket .ticket-no { color: var(--faint); font-weight: 500; margin-right: 6px; }
-  .ticket .desc { color: var(--muted); font-size: 13px; margin: 6px 0 10px; max-width: 72ch; }
-  .ticket .meta { font-size: 12px; color: var(--muted); padding-top: 10px; border-top: 1px solid #f1f5f9; }
-  .ticket .meta b { color: #334155; font-weight: 600; }
-  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-
+  /* Ticket listesi */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+  .filters > div { flex: 1; min-width: 130px; }
+  .ticket { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; background: var(--card); }
+  .ticket .top { display: flex; justify-content: space-between; align-items: start; gap: 10px; flex-wrap: wrap; }
+  .ticket h3 { font-size: 15px; }
+  .ticket .desc { color: var(--muted); font-size: 13px; margin: 6px 0 10px; }
+  .ticket .meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   .badges { display: flex; gap: 6px; flex-wrap: wrap; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 11px; font-weight: 600; letter-spacing: .02em;
-    padding: 3px 10px; border-radius: 20px; border: 1px solid transparent;
-  }
-  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .b-OPEN        { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
-  .b-IN_PROGRESS { background: #fffbeb; color: #b45309; border-color: #fef3c7; }
-  .b-DONE        { background: #f0fdf4; color: #15803d; border-color: #dcfce7; }
-  .b-LOW         { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
-  .b-MEDIUM      { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
-  .b-HIGH        { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
-  .r-ADMIN       { background: #eef2ff; color: #3730a3; border-color: #e0e7ff; }
-  .r-USER        { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+  .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+  .b-OPEN { background: #e7f0ff; color: #2b5bd7; }
+  .b-IN_PROGRESS { background: #fff3cd; color: #9a6b00; }
+  .b-DONE { background: #d1e7dd; color: #14653c; }
+  .b-LOW { background: #eef1f5; color: #566173; }
+  .b-MEDIUM { background: #e2ecff; color: #3b5bdb; }
+  .b-HIGH { background: #fde2e4; color: #b02a37; }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 14px; }
+  .pager span { font-size: 13px; color: var(--muted); }
 
-  .pager { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 18px; }
-  .pager span { font-size: 12px; color: var(--muted); }
-
-  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
-
-  /* ---------- Yorumlar ---------- */
-  .comments { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
-  .comments-title { font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 8px; }
-  .comment { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: var(--radius); padding: 9px 12px; margin-bottom: 6px; font-size: 13px; }
-  .comment b { font-size: 12px; color: #334155; }
-  .comment .when { color: var(--faint); font-size: 11px; margin-left: 6px; }
-  .comment-form { display: flex; gap: 8px; margin-top: 10px; }
+  /* Yorumlar */
+  .comments { margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 12px; }
+  .comment { background: var(--bg); border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; }
+  .comment b { font-size: 12px; }
+  .comment .when { color: var(--muted); font-size: 11px; }
+  .comment-form { display: flex; gap: 8px; margin-top: 8px; }
   .comment-form input { flex: 1; }
 
-  /* ---------- Tablolar ---------- */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  th { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; background: #f8fafc; }
-  tbody tr:hover, tr:not(:first-child):hover { background: #fafbfc; }
-  td b { font-weight: 600; }
-  .table-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: 12px; }
+  .table-wrap { overflow-x: auto; }
 
-  /* ---------- Bildirim ---------- */
-  #toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: #1e293b; color: #f1f5f9; padding: 11px 18px;
-    border-radius: var(--radius); font-size: 13px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .18); z-index: 60; max-width: min(420px, 90vw);
-  }
-  #toast.err { background: #7f1d1d; }
-  #toast.ok { background: #14532d; }
+  /* Bildirim */
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,.2); z-index: 50; max-width: 90vw; }
+  #toast.err { background: var(--danger); }
+  #toast.ok { background: var(--ok); }
 
-  /* ---------- Modal ---------- */
-  .modal-bg {
-    position: fixed; inset: 0; background: rgba(15, 23, 42, .5);
-    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 40;
-  }
-  .modal {
-    background: var(--surface); border-radius: 10px; padding: 26px;
-    width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-  }
-  .modal h2 { font-size: 16px; font-weight: 600; }
-  .modal .modal-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-  .modal-actions .btn { flex: 1; }
+  /* Modal */
+  .modal-bg { position: fixed; inset: 0; background: rgba(20,25,40,.45); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .modal { background: var(--card); border-radius: var(--radius); padding: 22px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+  .modal h2 { margin-bottom: 6px; }
 
-  @media (max-width: 640px) {
-    header { padding: 10px 16px; }
-    nav { order: 3; width: 100%; overflow-x: auto; }
-    nav button { padding: 10px 12px; white-space: nowrap; }
-    main { padding: 20px 14px 60px; }
-    .filters > div { max-width: none; min-width: 100%; }
-    .ticket .top { flex-direction: column; gap: 8px; }
-    .auth-card { padding: 28px 22px; }
+  @media (max-width: 600px) {
+    header { padding: 10px 12px; }
+    .ticket .top { flex-direction: column; }
+    .filters > div { min-width: 100%; }
   }
 </style>
 </head>
@@ -237,16 +110,10 @@
 <!-- ==================== GIRIS / KAYIT ==================== -->
 <div id="authView">
   <div class="auth-card">
-    <div class="brand">
-      <div class="brand-mark">TY</div>
-      <div>
-        <div class="brand-name">Ticket Yönetim Sistemi</div>
-        <div class="brand-sub">Destek Talepleri Paneli</div>
-      </div>
-    </div>
-    <p>Devam etmek için hesabınızla giriş yapın.</p>
+    <h1>🎫 Ticket Yönetim Sistemi</h1>
+    <p>Devam etmek için giriş yapın veya kayıt olun.</p>
     <div class="tabs">
-      <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Giriş Yap</button>
+      <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Giriş</button>
       <button id="tabRegister" onclick="switchAuthTab('register')">Kayıt Ol</button>
     </div>
     <form id="loginForm" onsubmit="doLogin(event)">
@@ -255,16 +122,16 @@
       <label>Şifre</label>
       <input id="loginPassword" type="password" required autocomplete="current-password">
       <button class="btn full" type="submit">Giriş Yap</button>
-      <div class="auth-note">Demo yönetici hesabı — kullanıcı adı: <b>admin</b>, şifre: <b>admin123</b></div>
+      <p style="margin-top:12px;font-size:12px;color:var(--muted)">Demo admin: <b>admin / admin123</b></p>
     </form>
     <form id="registerForm" class="hidden" onsubmit="doRegister(event)">
       <label>Kullanıcı adı</label>
       <input id="regUsername" required minlength="3">
-      <label>E-posta</label>
+      <label>Email</label>
       <input id="regEmail" type="email" required>
       <label>Şifre (en az 6 karakter)</label>
       <input id="regPassword" type="password" required minlength="6">
-      <button class="btn full" type="submit">Hesap Oluştur</button>
+      <button class="btn full" type="submit">Kayıt Ol</button>
     </form>
   </div>
 </div>
@@ -272,76 +139,65 @@
 <!-- ==================== ANA EKRAN ==================== -->
 <div id="appView" class="hidden">
   <header>
-    <div class="brand">
-      <div class="brand-mark">TY</div>
-      <div>
-        <div class="brand-name">Ticket Yönetim Sistemi</div>
-      </div>
+    <div>
+      <div class="brand">🎫 Ticket Yönetimi</div>
+      <div class="who"><b id="whoName"></b> · <span id="whoRole"></span></div>
     </div>
     <nav>
-      <button id="navDashboard" class="active" onclick="showPage('dashboard')">Genel Bakış</button>
+      <button id="navDashboard" class="active" onclick="showPage('dashboard')">Dashboard</button>
       <button id="navTickets" onclick="showPage('tickets')">Ticket'lar</button>
       <button id="navUsers" class="hidden" onclick="showPage('users')">Kullanıcılar</button>
-      <button id="navAudit" class="hidden" onclick="showPage('audit')">İşlem Kayıtları</button>
+      <button id="navAudit" class="hidden" onclick="showPage('audit')">Loglar</button>
+      <button onclick="logout()" style="color:var(--danger)">Çıkış</button>
     </nav>
-    <div class="header-right">
-      <div class="who">
-        <div class="who-name" id="whoName"></div>
-        <div class="who-role" id="whoRole"></div>
-      </div>
-      <button class="logout-btn" onclick="logout()">Çıkış</button>
-    </div>
   </header>
 
   <main>
-    <!-- Genel Bakis -->
+    <!-- Dashboard -->
     <section id="pageDashboard">
-      <div class="page-head"><div class="page-title">Genel Bakış</div></div>
       <div class="stats" id="statCards"></div>
-      <div class="card">
-        <h2>Son Oluşturulan Ticket'lar</h2>
+      <div class="card" style="margin-top:14px">
+        <h2>Son 5 Ticket</h2>
         <div id="lastTickets"></div>
       </div>
     </section>
 
     <!-- Ticketlar -->
     <section id="pageTickets" class="hidden">
-      <div class="page-head">
-        <div class="page-title">Ticket'lar</div>
-        <button class="btn" onclick="openTicketModal()">Yeni Ticket</button>
-      </div>
       <div class="card">
-        <div class="filters">
-          <div><label>Durum</label>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <h2 style="margin:0">Ticket'lar</h2>
+          <button class="btn" onclick="openTicketModal()">+ Yeni Ticket</button>
+        </div>
+        <div class="filters" style="margin-top:14px">
+          <div><label>Status</label>
             <select id="fStatus" onchange="state.page=0;loadTickets()">
-              <option value="">Tümü</option><option>OPEN</option><option>IN_PROGRESS</option><option>DONE</option>
+              <option value="">Hepsi</option><option>OPEN</option><option>IN_PROGRESS</option><option>DONE</option>
             </select></div>
           <div><label>Öncelik</label>
             <select id="fPriority" onchange="state.page=0;loadTickets()">
-              <option value="">Tümü</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
+              <option value="">Hepsi</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
             </select></div>
         </div>
         <div id="ticketList"></div>
         <div class="pager">
-          <button class="btn small secondary" id="prevBtn" onclick="state.page--;loadTickets()">Önceki</button>
+          <button class="btn small ghost" id="prevBtn" onclick="state.page--;loadTickets()">‹ Önceki</button>
           <span id="pageInfo"></span>
-          <button class="btn small secondary" id="nextBtn" onclick="state.page++;loadTickets()">Sonraki</button>
+          <button class="btn small ghost" id="nextBtn" onclick="state.page++;loadTickets()">Sonraki ›</button>
         </div>
       </div>
     </section>
 
     <!-- Kullanicilar (admin) -->
     <section id="pageUsers" class="hidden">
-      <div class="page-head"><div class="page-title">Kullanıcılar</div></div>
-      <div class="card">
+      <div class="card"><h2>Kullanıcılar</h2>
         <div class="table-wrap"><table id="userTable"></table></div>
       </div>
     </section>
 
-    <!-- Islem kayitlari (admin) -->
+    <!-- Audit log (admin) -->
     <section id="pageAudit" class="hidden">
-      <div class="page-head"><div class="page-title">İşlem Kayıtları</div></div>
-      <div class="card">
+      <div class="card"><h2>Audit Log</h2>
         <div class="table-wrap"><table id="auditTable"></table></div>
       </div>
     </section>
@@ -352,7 +208,6 @@
 <div id="ticketModal" class="modal-bg hidden" onclick="if(event.target===this)closeTicketModal()">
   <div class="modal">
     <h2 id="modalTitle">Yeni Ticket</h2>
-    <div class="modal-sub">Zorunlu alanları doldurup kaydedin.</div>
     <form onsubmit="saveTicket(event)">
       <label>Başlık</label>
       <input id="tTitle" required maxlength="200">
@@ -361,11 +216,11 @@
       <label>Öncelik</label>
       <select id="tPriority"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option></select>
       <label>Atanacak kullanıcı adı (opsiyonel)</label>
-      <input id="tAssigned" type="text" list="userOptions" placeholder="örn. admin">
+      <input id="tAssigned" type="text" list="userOptions" placeholder="örn: admin">
       <datalist id="userOptions"></datalist>
-      <div class="modal-actions">
-        <button class="btn" type="submit">Kaydet</button>
-        <button class="btn secondary" type="button" onclick="closeTicketModal()">Vazgeç</button>
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button class="btn" type="submit" style="flex:1">Kaydet</button>
+        <button class="btn ghost" type="button" onclick="closeTicketModal()">Vazgeç</button>
       </div>
     </form>
   </div>
@@ -373,7 +228,7 @@
 
 <script>
 const API = '/api';
-const state = { token: null, username: null, role: null, page: 0, totalPages: 0, editingId: null, openComments: new Set(), ticketsById: {} };
+const state = { token: null, username: null, role: null, page: 0, totalPages: 0, editingId: null, openComments: new Set() };
 
 /* ---------- yardimcilar ---------- */
 function $(id) { return document.getElementById(id); }
@@ -430,7 +285,7 @@ async function doRegister(e) {
   e.preventDefault();
   try {
     const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ username: $('regUsername').value, email: $('regEmail').value, password: $('regPassword').value }) });
-    toast('Kaydınız oluşturuldu.', 'ok');
+    toast('Kayıt başarılı, hoş geldin!', 'ok');
     startSession(data);
   } catch (err) { toast(err.message, 'err'); }
 }
@@ -441,7 +296,7 @@ function startSession(data) {
   $('authView').classList.add('hidden');
   $('appView').classList.remove('hidden');
   $('whoName').textContent = state.username;
-  $('whoRole').textContent = state.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı';
+  $('whoRole').textContent = state.role;
   const isAdmin = state.role === 'ADMIN';
   $('navUsers').classList.toggle('hidden', !isAdmin);
   $('navAudit').classList.toggle('hidden', !isAdmin);
@@ -468,20 +323,18 @@ function showPage(name) {
   if (name === 'audit') loadAudit();
 }
 
-/* ---------- genel bakis ---------- */
-const STATUS_TR = { OPEN: 'Açık', IN_PROGRESS: 'İşlemde', DONE: 'Tamamlandı' };
-
+/* ---------- dashboard ---------- */
 async function loadDashboard() {
   try {
     const d = await api('/dashboard');
-    let html = `<div class="stat"><div class="lbl">Toplam Ticket</div><div class="num">${d.totalTickets}</div></div>`;
+    let html = `<div class="stat"><div class="num">${d.totalTickets}</div><div class="lbl">Toplam Ticket</div></div>`;
     for (const [status, count] of Object.entries(d.ticketsByStatus)) {
-      html += `<div class="stat"><div class="lbl">${STATUS_TR[status] || status}</div><div class="num">${count}</div></div>`;
+      html += `<div class="stat"><div class="num">${count}</div><div class="lbl">${status}</div></div>`;
     }
     $('statCards').innerHTML = html;
     $('lastTickets').innerHTML = d.lastFiveTickets.length
       ? d.lastFiveTickets.map(t => ticketCard(t, 'd')).join('')
-      : '<p class="empty">Henüz ticket bulunmuyor.</p>';
+      : '<p style="color:var(--muted);font-size:14px">Henüz ticket yok.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -497,8 +350,8 @@ async function loadTickets() {
     d.content.forEach(t => { state.ticketsById[t.id] = t; });
     $('ticketList').innerHTML = d.content.length
       ? d.content.map(t => ticketCard(t, 't')).join('')
-      : '<p class="empty">Gösterilecek ticket bulunamadı.</p>';
-    $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} — ${d.totalElements} kayıt` : '';
+      : '<p style="color:var(--muted);font-size:14px;padding:10px 0">Gösterilecek ticket bulunamadı.</p>';
+    $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} (${d.totalElements} kayıt)` : '';
     $('prevBtn').disabled = d.page <= 0;
     $('nextBtn').disabled = d.page >= d.totalPages - 1;
     for (const key of [...state.openComments]) {
@@ -509,7 +362,7 @@ async function loadTickets() {
   } catch (err) { toast(err.message, 'err'); }
 }
 
-/* ctx: 't' = Ticket'lar sayfasi, 'd' = Genel Bakis.
+/* ctx: 't' = Ticket'lar sayfasi, 'd' = Dashboard.
    Ayni ticket iki sayfada da gorunebildigi icin yorum kutusu
    kimlikleri ctx ile ayristirilir — aksi halde kutu yanlis
    sayfadaki (gizli) kopyada acilir ve calismiyor sanilir. */
@@ -521,31 +374,30 @@ function ticketCard(t, ctx) {
   const isAdmin = state.role === 'ADMIN';
   let actions = '';
   if (!compact) {
-    if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">İşleme Al</button>`;
-    if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">Tamamla</button>`;
-    if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
+    if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">▶ Başlat (IN_PROGRESS)</button>`;
+    if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">✔ Bitir (DONE)</button>`;
+    if (mine) actions += `<button class="btn small ghost" onclick="openTicketModalById(${t.id})">✏ Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
-  // Genel Bakis'ta yorum butonu ticket'i olusturana gosterilmez —
+  // Dashboard'da yorum butonu ticket'i olusturana gosterilmez —
   // olusturan kisi zaten Ticket'lar sayfasindan yorum yazabilir.
   const yorumGoster = compact ? !mine : true;
-  if (yorumGoster) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorumlar</button>`;
+  if (yorumGoster) actions += `<button class="btn small ghost" onclick="toggleComments('${ctx}',${t.id})">💬 Yorum yap</button>`;
   const key = ctx + '-' + t.id;
   return `
   <div class="ticket">
-    <div class="creator">Oluşturan: <b>${esc(t.createdBy)}</b></div>
+    <div class="meta">👤 Oluşturan: <b>${esc(t.createdBy)}</b></div>
     <div class="top">
-      <h3><span class="ticket-no">#${t.id}</span>${esc(t.title)}</h3>
-      <div class="badges"><span class="badge b-${t.status}">${STATUS_TR[t.status] || t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
+      <h3>#${t.id} — ${esc(t.title)}</h3>
+      <div class="badges"><span class="badge b-${t.status}">${t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
     </div>
     <div class="desc">${esc(t.description)}</div>
-    <div class="meta">Atanan: <b>${esc(t.assignedTo || '—')}</b> &nbsp;·&nbsp; Oluşturma: ${fmtDate(t.createdDate)} &nbsp;·&nbsp; Son güncelleme: ${fmtDate(t.updatedDate)}</div>
+    <div class="meta">Atanan: <b>${esc(t.assignedTo || '-')}</b> · Oluşturma: ${fmtDate(t.createdDate)} · Güncelleme: ${fmtDate(t.updatedDate)}</div>
     <div class="actions">${actions}</div>
     <div id="cbox-${key}" class="comments hidden">
-      <div class="comments-title">Yorumlar</div>
       <div id="clist-${key}"></div>
       <form class="comment-form" onsubmit="addComment(event,'${ctx}',${t.id})">
-        <input id="cinput-${key}" placeholder="Yorumunuzu yazın..." required>
+        <input id="cinput-${key}" placeholder="Yorum yaz..." required>
         <button class="btn small" type="submit">Gönder</button>
       </form>
     </div>
@@ -560,16 +412,16 @@ function openTicketModalById(id) {
 async function changeStatus(id, status) {
   try {
     await api(`/tickets/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
-    toast('Durum güncellendi: ' + (STATUS_TR[status] || status), 'ok');
+    toast('Status güncellendi: ' + status, 'ok');
     loadTickets();
   } catch (err) { toast(err.message, 'err'); }
 }
 
 async function deleteTicket(id) {
-  if (!confirm('#' + id + ' numaralı ticket kalıcı olarak silinecek. Onaylıyor musunuz?')) return;
+  if (!confirm('#' + id + ' numaralı ticket silinsin mi?')) return;
   try {
     await api('/tickets/' + id, { method: 'DELETE' });
-    toast('Ticket silindi.', 'ok');
+    toast('Ticket silindi', 'ok');
     loadTickets();
   } catch (err) { toast(err.message, 'err'); }
 }
@@ -577,7 +429,7 @@ async function deleteTicket(id) {
 /* ---------- ticket olustur / duzenle ---------- */
 function openTicketModal(t) {
   state.editingId = t ? t.id : null;
-  $('modalTitle').textContent = t ? ('Ticket Düzenle — #' + t.id) : 'Yeni Ticket';
+  $('modalTitle').textContent = t ? ('#' + t.id + ' Düzenle') : 'Yeni Ticket';
   $('tTitle').value = t ? t.title : '';
   $('tDesc').value = t ? t.description : '';
   $('tPriority').value = t ? t.priority : 'MEDIUM';
@@ -614,10 +466,10 @@ async function saveTicket(e) {
   try {
     if (state.editingId) {
       await api('/tickets/' + state.editingId, { method: 'PUT', body: JSON.stringify(body) });
-      toast('Ticket güncellendi.', 'ok');
+      toast('Ticket güncellendi', 'ok');
     } else {
       await api('/tickets', { method: 'POST', body: JSON.stringify(body) });
-      toast('Ticket oluşturuldu.', 'ok');
+      toast('Ticket oluşturuldu (status: OPEN)', 'ok');
     }
     closeTicketModal();
     showPage('tickets');
@@ -638,8 +490,8 @@ async function loadComments(ctx, id) {
   try {
     const list = await api(`/tickets/${id}/comments`);
     $('clist-' + ctx + '-' + id).innerHTML = list.length
-      ? list.map(c => `<div class="comment"><b>${esc(c.author)}</b><span class="when">${fmtDate(c.createdDate)}</span><br>${esc(c.content)}</div>`).join('')
-      : '<p class="empty" style="font-size:12px">Henüz yorum yapılmamış.</p>';
+      ? list.map(c => `<div class="comment"><b>${esc(c.author)}</b> <span class="when">${fmtDate(c.createdDate)}</span><br>${esc(c.content)}</div>`).join('')
+      : '<p style="color:var(--muted);font-size:12px;margin-bottom:6px">Henüz yorum yok.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -650,20 +502,20 @@ async function addComment(e, ctx, id) {
     await api(`/tickets/${id}/comments`, { method: 'POST', body: JSON.stringify({ content: input.value }) });
     input.value = '';
     loadComments(ctx, id);
-    toast('Yorum eklendi.', 'ok');
+    toast('Yorum eklendi', 'ok');
   } catch (err) { toast(err.message, 'err'); }
 }
 
-/* ---------- yonetici sayfalari ---------- */
+/* ---------- admin sayfalari ---------- */
 async function loadUsers() {
   try {
     const users = await api('/users');
-    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Rol</th><th>Oluşturduğu</th><th>Atandığı</th><th>Yorumları</th></tr>' +
+    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı adı</th><th>Email</th><th>Rol</th><th>Oluşturduğu Ticket</th><th>Atandığı Ticket</th><th>Yorum Sayısı</th></tr>' +
       users.map(u => `<tr>
         <td>${u.id}</td>
         <td><b>${esc(u.username)}</b></td>
         <td>${esc(u.email)}</td>
-        <td><span class="badge r-${u.role}">${u.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</span></td>
+        <td><span class="badge ${u.role === 'ADMIN' ? 'b-HIGH' : 'b-MEDIUM'}">${u.role}</span></td>
         <td>${u.createdTicketCount}</td>
         <td>${u.assignedTicketCount}</td>
         <td>${u.commentCount}</td>
@@ -671,19 +523,11 @@ async function loadUsers() {
   } catch (err) { toast(err.message, 'err'); }
 }
 
-const ACTION_TR = {
-  TICKET_CREATED: 'Ticket oluşturuldu',
-  TICKET_UPDATED: 'Ticket güncellendi',
-  TICKET_DELETED: 'Ticket silindi',
-  STATUS_CHANGED: 'Durum değişikliği',
-  LOGIN: 'Oturum açma'
-};
-
 async function loadAudit() {
   try {
     const logs = await api('/audit-logs');
     $('auditTable').innerHTML = '<tr><th>Zaman</th><th>İşlem</th><th>Kullanıcı</th><th>Ticket</th><th>Detay</th></tr>' +
-      logs.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td><b>${esc(l.username)}</b></td><td>${l.ticketId ?? '—'}</td><td>${esc(l.details)}</td></tr>`).join('');
+      logs.map(l => `<tr><td>${fmtDate(l.timestamp)}</td><td>${l.action}</td><td>${esc(l.username)}</td><td>${l.ticketId ?? '-'}</td><td>${esc(l.details)}</td></tr>`).join('');
   } catch (err) { toast(err.message, 'err'); }
 }
 
