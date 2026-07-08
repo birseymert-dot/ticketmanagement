@@ -4,5 +4,5 @@ import com.ticketmanagement.dto.response.DashboardResponse;
 
 public interface DashboardService {
 
-    DashboardResponse getDashboard();
+    DashboardResponse getDashboard(String username);
 }

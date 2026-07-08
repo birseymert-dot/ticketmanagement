@@ -39,9 +39,23 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     long countByStatus(TicketStatus status);
 
+    @Query("SELECT COUNT(t) FROM Ticket t WHERE t.createdBy.id = :userId OR t.assignedTo.id = :userId")
+    long countVisibleByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(t) FROM Ticket t " +
+            "WHERE (t.createdBy.id = :userId OR t.assignedTo.id = :userId) " +
+            "AND t.status = :status")
+    long countVisibleByUserIdAndStatus(@Param("userId") Long userId,
+                                       @Param("status") TicketStatus status);
+
     long countByCreatedById(Long userId);
 
     long countByAssignedToId(Long userId);
 
     List<Ticket> findTop5ByOrderByCreatedDateDesc();
+
+    @Query("SELECT t FROM Ticket t " +
+            "WHERE t.createdBy.id = :userId OR t.assignedTo.id = :userId " +
+            "ORDER BY t.createdDate DESC")
+    List<Ticket> findVisibleTopByUserId(@Param("userId") Long userId, Pageable pageable);
 }

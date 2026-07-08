@@ -13,3 +13,8 @@ target/
 .DS_Store
 Thumbs.db
 .claude/
+
+# Local database files
+data/
+*.mv.db
+*.trace.db

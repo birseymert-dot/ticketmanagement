@@ -17,6 +17,21 @@ Rol bazlı yetkilendirme ve iş kuralları içeren Ticket Yönetim Sistemi (Spri
 mvn spring-boot:run
 ```
 
+## Guvenli Calisma Notlari
+
+- Veritabani varsayilan olarak dosya tabanli H2 ile calisir ve `data/` klasorunde kalici tutulur.
+- H2 console varsayilan olarak kapali gelir. Local inceleme icin `H2_CONSOLE_ENABLED=true` ile acilabilir.
+- JWT secret production ortaminda ortam degiskeniyle verilmelidir: `JWT_SECRET`.
+- Veritabani baglantisi `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` ile degistirilebilir.
+
+## Teslim Dokumanlari
+
+Ek dokumanlar `docs/` klasorundedir:
+
+- `docs/PROJECT_DOCUMENTATION.md`
+- `docs/PRESENTATION.md`
+- `docs/DAILY_REPORT_SAMPLE.md`
+
 Uygulama `http://localhost:8080` üzerinde çalışır.
 
 Testler:

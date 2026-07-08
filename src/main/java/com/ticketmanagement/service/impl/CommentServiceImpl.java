@@ -3,10 +3,12 @@ package com.ticketmanagement.service.impl;
 import com.ticketmanagement.dto.request.CommentRequest;
 import com.ticketmanagement.dto.response.CommentResponse;
 import com.ticketmanagement.exception.BadRequestException;
+import com.ticketmanagement.exception.ForbiddenException;
 import com.ticketmanagement.exception.NotFoundException;
 import com.ticketmanagement.model.entity.Comment;
 import com.ticketmanagement.model.entity.Ticket;
 import com.ticketmanagement.model.entity.User;
+import com.ticketmanagement.model.enums.Role;
 import com.ticketmanagement.repository.CommentRepository;
 import com.ticketmanagement.repository.TicketRepository;
 import com.ticketmanagement.repository.UserRepository;
@@ -43,6 +45,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new NotFoundException("Ticket bulunamadi: " + ticketId));
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Kullanici bulunamadi: " + username));
+        validateTicketAccess(ticket, author);
 
         Comment comment = new Comment();
         comment.setContent(request.getContent().trim());
@@ -55,11 +58,31 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByTicket(Long ticketId, String username) {
-        if (!ticketRepository.existsById(ticketId)) {
-            throw new NotFoundException("Ticket bulunamadi: " + ticketId);
-        }
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new NotFoundException("Ticket bulunamadi: " + ticketId));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Kullanici bulunamadi: " + username));
+        validateTicketAccess(ticket, user);
+
         return commentRepository.findByTicketIdOrderByCreatedDateAsc(ticketId).stream()
                 .map(CommentResponse::from)
                 .toList();
+    }
+
+    /**
+     * Comment erisimi ticket goruntuleme kuraliyla ayni tutulur:
+     * ADMIN tum ticket yorumlarini gorebilir/ekleyebilir.
+     * USER sadece kendi olusturdugu veya kendisine atanan ticket uzerinde yorum islemi yapabilir.
+     */
+    private void validateTicketAccess(Ticket ticket, User user) {
+        if (user.getRole() == Role.ADMIN) {
+            return;
+        }
+        boolean isCreator = ticket.getCreatedBy().getId().equals(user.getId());
+        boolean isAssignee = ticket.getAssignedTo() != null
+                && ticket.getAssignedTo().getId().equals(user.getId());
+        if (!isCreator && !isAssignee) {
+            throw new ForbiddenException("Bu ticket icin yorum yetkiniz yok");
+        }
     }
 }
