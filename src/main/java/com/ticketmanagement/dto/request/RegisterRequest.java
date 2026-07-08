@@ -15,6 +15,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Sifre bos olamaz")
+    @Size(min = 6, message = "Sifre en az 6 karakter olmalidir")
     private String password;
 
     public String getUsername() {
