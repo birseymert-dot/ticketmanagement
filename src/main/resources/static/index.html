@@ -379,7 +379,10 @@ function ticketCard(t, ctx) {
     if (mine) actions += `<button class="btn small ghost" onclick="openTicketModalById(${t.id})">✏ Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
-  actions += `<button class="btn small ghost" onclick="toggleComments('${ctx}',${t.id})">💬 Yorum yap</button>`;
+  // Dashboard'da yorum butonu ticket'i olusturana gosterilmez —
+  // olusturan kisi zaten Ticket'lar sayfasindan yorum yazabilir.
+  const yorumGoster = compact ? !mine : true;
+  if (yorumGoster) actions += `<button class="btn small ghost" onclick="toggleComments('${ctx}',${t.id})">💬 Yorum yap</button>`;
   const key = ctx + '-' + t.id;
   return `
   <div class="ticket">
@@ -507,8 +510,16 @@ async function addComment(e, ctx, id) {
 async function loadUsers() {
   try {
     const users = await api('/users');
-    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı adı</th><th>Email</th><th>Rol</th></tr>' +
-      users.map(u => `<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${esc(u.email)}</td><td>${u.role}</td></tr>`).join('');
+    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı adı</th><th>Email</th><th>Rol</th><th>Oluşturduğu Ticket</th><th>Atandığı Ticket</th><th>Yorum Sayısı</th></tr>' +
+      users.map(u => `<tr>
+        <td>${u.id}</td>
+        <td><b>${esc(u.username)}</b></td>
+        <td>${esc(u.email)}</td>
+        <td><span class="badge ${u.role === 'ADMIN' ? 'b-HIGH' : 'b-MEDIUM'}">${u.role}</span></td>
+        <td>${u.createdTicketCount}</td>
+        <td>${u.assignedTicketCount}</td>
+        <td>${u.commentCount}</td>
+      </tr>`).join('');
   } catch (err) { toast(err.message, 'err'); }
 }
 

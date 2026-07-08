@@ -39,5 +39,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     long countByStatus(TicketStatus status);
 
+    long countByCreatedById(Long userId);
+
+    long countByAssignedToId(Long userId);
+
     List<Ticket> findTop5ByOrderByCreatedDateDesc();
 }
