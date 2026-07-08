@@ -13,5 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     void deleteByTicketId(Long ticketId);
 
+    void deleteByAuthorId(Long authorId);
+
     long countByAuthorId(Long userId);
 }

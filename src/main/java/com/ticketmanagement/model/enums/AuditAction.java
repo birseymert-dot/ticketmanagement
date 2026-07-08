@@ -5,5 +5,6 @@ public enum AuditAction {
     TICKET_UPDATED,
     TICKET_DELETED,
     STATUS_CHANGED,
-    LOGIN
+    LOGIN,
+    USER_DELETED
 }

@@ -684,7 +684,7 @@ async function addComment(e, ctx, id) {
 async function loadUsers() {
   try {
     const users = await api('/users');
-    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Rol</th><th>Oluşturduğu</th><th>Atandığı</th><th>Yorumları</th></tr>' +
+    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Rol</th><th>Oluşturduğu</th><th>Atandığı</th><th>Yorumları</th><th>İşlem</th></tr>' +
       users.map(u => `<tr>
         <td>${u.id}</td>
         <td><b>${esc(u.username)}</b></td>
@@ -693,7 +693,17 @@ async function loadUsers() {
         <td>${u.createdTicketCount}</td>
         <td>${u.assignedTicketCount}</td>
         <td>${u.commentCount}</td>
+        <td>${u.username === state.username ? '<span style="color:var(--faint);font-size:12px">—</span>' : `<button class="btn small danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Sil</button>`}</td>
       </tr>`).join('');
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function deleteUser(id, username) {
+  if (!confirm(`"${username}" kullanıcısı silinecek. Açtığı ticket'lar ve yorumları da silinir, kendisine atanmış ticket'lar atamasız kalır. Onaylıyor musunuz?`)) return;
+  try {
+    await api('/users/' + id, { method: 'DELETE' });
+    toast('Kullanıcı silindi.', 'ok');
+    loadUsers();
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -702,7 +712,8 @@ const ACTION_TR = {
   TICKET_UPDATED: 'Ticket güncellendi',
   TICKET_DELETED: 'Ticket silindi',
   STATUS_CHANGED: 'Durum değişikliği',
-  LOGIN: 'Oturum açma'
+  LOGIN: 'Oturum açma',
+  USER_DELETED: 'Kullanıcı silindi'
 };
 
 async function loadAudit() {

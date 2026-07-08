@@ -52,6 +52,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     long countByAssignedToId(Long userId);
 
+    List<Ticket> findByCreatedById(Long userId);
+
+    List<Ticket> findByAssignedToId(Long userId);
+
     List<Ticket> findTop5ByOrderByCreatedDateDesc();
 
     @Query("SELECT t FROM Ticket t " +
