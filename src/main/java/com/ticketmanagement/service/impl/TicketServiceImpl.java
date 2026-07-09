@@ -30,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
  * 2. Sadece ticket'i olusturan kullanici ticket'i guncelleyebilir.
  * 3. Sadece ADMIN ticket silebilir.
  * 4. Status gecisleri: OPEN -> IN_PROGRESS -> DONE (DONE geri OPEN olamaz).
- * 5. Sadece assigned kullanici status degistirebilir.
+ * 5. Status degisikligini (Isleme Al / Tamamla) sadece ADMIN yapabilir.
+ *    (Dokumandaki ozgun kural "atanan kullanici" idi; proje talebiyle degistirildi.
+ *    Duzenleme ve yorum yetkileri degismedi.)
  * 6. CreatedBy alani degistirilemez.
  */
 @Service
@@ -144,9 +146,11 @@ public class TicketServiceImpl implements TicketService {
         User user = findUser(username);
         Ticket ticket = findTicket(id);
 
-        // Is kurali #5: sadece assigned kullanici status degistirebilir
-        if (ticket.getAssignedTo() == null || !ticket.getAssignedTo().getId().equals(user.getId())) {
-            throw new ForbiddenException("Sadece ticket'a atanan kullanici status degistirebilir");
+        // Status degisikligi yalnizca ADMIN tarafindan yapilabilir.
+        // (Dokumanin 5. kurali "atanan kullanici degistirir" seklindeydi;
+        // proje yonetimi talebiyle yetki ADMIN'e tasindi.)
+        if (user.getRole() != Role.ADMIN) {
+            throw new ForbiddenException("Ticket durumunu sadece ADMIN degistirebilir");
         }
 
         // Is kurali #4: gecerli status gecis kontrolu

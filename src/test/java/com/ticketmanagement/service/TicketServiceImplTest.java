@@ -127,16 +127,16 @@ class TicketServiceImplTest {
     // ------------------------------------------------------------------
 
     @Test
-    @DisplayName("Assigned kullanici OPEN -> IN_PROGRESS gecisini yapabilmelidir")
+    @DisplayName("ADMIN OPEN -> IN_PROGRESS gecisini yapabilmelidir")
     void updateStatus_shouldAllowValidTransition() {
         StatusUpdateRequest request = new StatusUpdateRequest();
         request.setStatus(TicketStatus.IN_PROGRESS);
 
-        when(userRepository.findByUsername("assignee")).thenReturn(Optional.of(assignee));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        TicketResponse response = ticketService.updateStatus(10L, request, "assignee");
+        TicketResponse response = ticketService.updateStatus(10L, request, "admin");
 
         assertEquals(TicketStatus.IN_PROGRESS, response.getStatus());
     }
@@ -148,11 +148,11 @@ class TicketServiceImplTest {
         StatusUpdateRequest request = new StatusUpdateRequest();
         request.setStatus(TicketStatus.OPEN);
 
-        when(userRepository.findByUsername("assignee")).thenReturn(Optional.of(assignee));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
 
         assertThrows(BadRequestException.class,
-                () -> ticketService.updateStatus(10L, request, "assignee"));
+                () -> ticketService.updateStatus(10L, request, "admin"));
         verify(ticketRepository, never()).save(any(Ticket.class));
     }
 
@@ -162,25 +162,26 @@ class TicketServiceImplTest {
         StatusUpdateRequest request = new StatusUpdateRequest();
         request.setStatus(TicketStatus.DONE);
 
-        when(userRepository.findByUsername("assignee")).thenReturn(Optional.of(assignee));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
 
         assertThrows(BadRequestException.class,
-                () -> ticketService.updateStatus(10L, request, "assignee"));
+                () -> ticketService.updateStatus(10L, request, "admin"));
         verify(ticketRepository, never()).save(any(Ticket.class));
     }
 
     @Test
-    @DisplayName("Assigned olmayan kullanici status degistirememelidir")
-    void updateStatus_shouldRejectNonAssignedUser() {
+    @DisplayName("ADMIN olmayan kullanici (atanan dahil) status degistirememelidir")
+    void updateStatus_shouldRejectNonAdmin() {
         StatusUpdateRequest request = new StatusUpdateRequest();
         request.setStatus(TicketStatus.IN_PROGRESS);
 
-        when(userRepository.findByUsername("other")).thenReturn(Optional.of(otherUser));
+        // Ticket'a atanan kullanici bile artik status degistiremez
+        when(userRepository.findByUsername("assignee")).thenReturn(Optional.of(assignee));
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
 
         assertThrows(ForbiddenException.class,
-                () -> ticketService.updateStatus(10L, request, "other"));
+                () -> ticketService.updateStatus(10L, request, "assignee"));
         verify(ticketRepository, never()).save(any(Ticket.class));
     }
 

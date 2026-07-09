@@ -561,8 +561,8 @@ function ticketCard(t, ctx) {
   const isAdmin = state.role === 'ADMIN';
   let actions = '';
   if (!compact) {
-    if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">İşleme Al</button>`;
-    if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">Tamamla</button>`;
+    if (isAdmin && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">İşleme Al</button>`;
+    if (isAdmin && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">Tamamla</button>`;
     if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
