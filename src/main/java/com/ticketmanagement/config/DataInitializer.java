@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
@@ -25,8 +26,11 @@ import java.util.Set;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initAdmin(UserRepository userRepository,
+                                       PasswordEncoder passwordEncoder,
+                                       JdbcTemplate jdbcTemplate) {
         return args -> {
+            fixAuditActionColumn(jdbcTemplate);
             deduplicateUsernames(userRepository);
 
             if (!userRepository.existsByUsernameIgnoreCase("admin")) {
@@ -39,6 +43,22 @@ public class DataInitializer {
                 userRepository.save(admin);
             }
         };
+    }
+
+    /**
+     * Eski veritabanlarinda AUDIT_LOGS.ACTION kolonu, tablo olusturuldugu
+     * andaki enum degerleriyle sinirli bir ENUM tipi olarak yaratilmis olabilir.
+     * Enum'a sonradan eklenen degerler (orn. USER_DELETED) bu kolona yazilamaz
+     * ve islem 500 hatasiyla patlar. Kolon VARCHAR'a cevrilerek bugunku ve
+     * gelecekteki tum enum degerlerine uyumlu hale getirilir (idempotent).
+     */
+    private void fixAuditActionColumn(JdbcTemplate jdbcTemplate) {
+        try {
+            jdbcTemplate.execute("ALTER TABLE AUDIT_LOGS ALTER COLUMN ACTION VARCHAR(50) NOT NULL");
+        } catch (Exception e) {
+            // Tablo henuz yoksa veya veritabani desteklemiyorsa sessizce gecilir;
+            // yeni olusan tablolarda sorun zaten olusmaz.
+        }
     }
 
     /**
