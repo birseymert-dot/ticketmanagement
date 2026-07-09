@@ -8,7 +8,7 @@ Rol bazlı yetkilendirme ve iş kuralları içeren Ticket Yönetim Sistemi (Spri
 - Spring Boot 3.3
 - Spring Security (JWT tabanlı authentication)
 - Spring Data JPA
-- H2 (in-memory veritabanı — kurulum gerektirmez)
+- H2 (dosya tabanlı veritabanı — kurulum gerektirmez, veriler data/ klasorunde kalici tutulur)
 - JUnit 5 + Mockito
 
 ## Çalıştırma
