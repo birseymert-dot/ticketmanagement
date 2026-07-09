@@ -323,7 +323,8 @@
             <select id="fPriority" onchange="state.page=0;loadTickets()">
               <option value="">Tümü</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
             </select></div>
-          <div><label>Kullanıcı ara (oluşturan / atanan)</label>
+          <!-- Sadece ADMIN gorur: USER zaten yalnizca kendi ticket'larini listeler -->
+          <div id="fSearchWrap"><label>Kullanıcı ara (oluşturan / atanan)</label>
             <input id="fSearchUser" type="text" placeholder="örn. yagmur" oninput="onTicketSearchInput()"></div>
         </div>
         <div id="ticketList"></div>
@@ -460,6 +461,10 @@ function startSession(data) {
   const isAdmin = state.role === 'ADMIN';
   $('navUsers').classList.toggle('hidden', !isAdmin);
   $('navAudit').classList.toggle('hidden', !isAdmin);
+  // Kullanici arama kutusu sadece ADMIN'e gorunur:
+  // USER zaten yalnizca kendi ticket'larini listeleyebilir
+  $('fSearchWrap').classList.toggle('hidden', !isAdmin);
+  $('fSearchUser').value = '';
   showPage(isAdmin ? 'dashboard' : 'tickets');
 }
 
