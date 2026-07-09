@@ -43,18 +43,22 @@ public class TicketController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** Listeleme: pagination zorunlu, status / priority / assignedTo filtreleri opsiyonel. */
+    /**
+     * Listeleme: pagination zorunlu; status / priority / assignedTo filtreleri ve
+     * kullanici adina gore arama (searchUser: olusturan veya atanan) opsiyonel.
+     */
     @GetMapping
     public ResponseEntity<PageResponse<TicketResponse>> getTickets(
             @RequestParam(required = false) TicketStatus status,
             @RequestParam(required = false) TicketPriority priority,
             @RequestParam(required = false) Long assignedToId,
+            @RequestParam(required = false) String searchUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Authentication authentication) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
         return ResponseEntity.ok(
-                ticketService.getTickets(status, priority, assignedToId, pageable, authentication.getName()));
+                ticketService.getTickets(status, priority, assignedToId, searchUser, pageable, authentication.getName()));
     }
 
     @GetMapping("/{id}")

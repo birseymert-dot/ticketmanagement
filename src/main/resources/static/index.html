@@ -323,6 +323,8 @@
             <select id="fPriority" onchange="state.page=0;loadTickets()">
               <option value="">Tümü</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
             </select></div>
+          <div><label>Kullanıcı ara (oluşturan / atanan)</label>
+            <input id="fSearchUser" type="text" placeholder="örn. yagmur" oninput="onTicketSearchInput()"></div>
         </div>
         <div id="ticketList"></div>
         <div class="pager">
@@ -345,7 +347,12 @@
     <section id="pageAudit" class="hidden">
       <div class="page-head"><div class="page-title">İşlem Kayıtları</div></div>
       <div class="card">
+        <div class="filters">
+          <div><label>Kayıtlarda ara (kullanıcı, işlem, detay)</label>
+            <input id="auditSearch" type="text" placeholder="örn. yagmur veya silindi" oninput="renderAudit()"></div>
+        </div>
         <div class="table-wrap"><table id="auditTable"></table></div>
+        <p class="empty" id="auditCount" style="margin-top:8px"></p>
       </div>
     </section>
   </main>
@@ -499,6 +506,7 @@ async function loadTickets() {
     const params = new URLSearchParams({ page: state.page, size: 5 });
     if ($('fStatus').value) params.append('status', $('fStatus').value);
     if ($('fPriority').value) params.append('priority', $('fPriority').value);
+    if ($('fSearchUser').value.trim()) params.append('searchUser', $('fSearchUser').value.trim());
     const d = await api('/tickets?' + params);
     if (d.content.length === 0 && d.totalElements > 0 && state.page > 0) {
       state.page = 0;
@@ -524,8 +532,16 @@ async function loadTickets() {
 function resetTicketFilters() {
   $('fStatus').value = '';
   $('fPriority').value = '';
+  $('fSearchUser').value = '';
   state.page = 0;
   loadTickets();
+}
+
+/* Kullanici arama kutusu: yazmayi biraktiktan kisa sure sonra arar */
+let ticketSearchTimer = null;
+function onTicketSearchInput() {
+  clearTimeout(ticketSearchTimer);
+  ticketSearchTimer = setTimeout(() => { state.page = 0; loadTickets(); }, 350);
 }
 
 /* ctx: 't' = Ticket'lar sayfasi, 'd' = Genel Bakis.
@@ -718,10 +734,26 @@ const ACTION_TR = {
 
 async function loadAudit() {
   try {
-    const logs = await api('/audit-logs');
-    $('auditTable').innerHTML = '<tr><th>Zaman</th><th>İşlem</th><th>Kullanıcı</th><th>Ticket</th><th>Detay</th></tr>' +
-      logs.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td><b>${esc(l.username)}</b></td><td>${l.ticketId ?? '—'}</td><td>${esc(l.details)}</td></tr>`).join('');
+    state.auditLogs = await api('/audit-logs');
+    renderAudit();
   } catch (err) { toast(err.message, 'err'); }
+}
+
+/* Islem kayitlarinda canli arama: kullanici adi, islem turu ve detayda gecen metne bakar */
+function renderAudit() {
+  const logs = state.auditLogs || [];
+  const query = ($('auditSearch').value || '').trim().toLowerCase();
+  const filtered = !query ? logs : logs.filter(l =>
+    (l.username || '').toLowerCase().includes(query) ||
+    (ACTION_TR[l.action] || l.action || '').toLowerCase().includes(query) ||
+    (l.details || '').toLowerCase().includes(query) ||
+    String(l.ticketId || '').includes(query)
+  );
+  $('auditTable').innerHTML = '<tr><th>Zaman</th><th>İşlem</th><th>Kullanıcı</th><th>Ticket</th><th>Detay</th></tr>' +
+    filtered.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td><b>${esc(l.username)}</b></td><td>${l.ticketId ?? '—'}</td><td>${esc(l.details)}</td></tr>`).join('');
+  $('auditCount').textContent = query
+    ? `${filtered.length} / ${logs.length} kayıt eşleşti`
+    : `${logs.length} kayıt`;
 }
 
 /* ---------- oturumu hatirla ---------- */

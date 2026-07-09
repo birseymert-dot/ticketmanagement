@@ -15,26 +15,35 @@ import java.util.List;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-    /** ADMIN icin: tum ticket'lar uzerinde status / priority / assigned user filtresi + pagination. */
-    @Query("SELECT t FROM Ticket t " +
+    /**
+     * ADMIN icin: tum ticket'lar uzerinde status / priority / assigned user filtresi + pagination.
+     * searchName dolu ise olusturan VEYA atanan kullanici adinda gecen ticket'lar doner (harf duyarsiz).
+     */
+    @Query("SELECT t FROM Ticket t LEFT JOIN t.assignedTo assignee JOIN t.createdBy creator " +
             "WHERE (:status IS NULL OR t.status = :status) " +
             "AND (:priority IS NULL OR t.priority = :priority) " +
-            "AND (:assignedToId IS NULL OR t.assignedTo.id = :assignedToId)")
+            "AND (:assignedToId IS NULL OR assignee.id = :assignedToId) " +
+            "AND (:searchName IS NULL OR LOWER(creator.username) LIKE LOWER(CONCAT('%', :searchName, '%')) " +
+            "     OR LOWER(assignee.username) LIKE LOWER(CONCAT('%', :searchName, '%')))")
     Page<Ticket> findAllWithFilters(@Param("status") TicketStatus status,
                                     @Param("priority") TicketPriority priority,
                                     @Param("assignedToId") Long assignedToId,
+                                    @Param("searchName") String searchName,
                                     Pageable pageable);
 
-    /** USER icin: sadece kendi olusturdugu veya kendisine atanan ticket'lar. */
-    @Query("SELECT t FROM Ticket t " +
-            "WHERE (t.createdBy.id = :userId OR t.assignedTo.id = :userId) " +
+    /** USER icin: sadece kendi olusturdugu veya kendisine atanan ticket'lar (+ ayni filtreler). */
+    @Query("SELECT t FROM Ticket t LEFT JOIN t.assignedTo assignee JOIN t.createdBy creator " +
+            "WHERE (creator.id = :userId OR assignee.id = :userId) " +
             "AND (:status IS NULL OR t.status = :status) " +
             "AND (:priority IS NULL OR t.priority = :priority) " +
-            "AND (:assignedToId IS NULL OR t.assignedTo.id = :assignedToId)")
+            "AND (:assignedToId IS NULL OR assignee.id = :assignedToId) " +
+            "AND (:searchName IS NULL OR LOWER(creator.username) LIKE LOWER(CONCAT('%', :searchName, '%')) " +
+            "     OR LOWER(assignee.username) LIKE LOWER(CONCAT('%', :searchName, '%')))")
     Page<Ticket> findOwnWithFilters(@Param("userId") Long userId,
                                     @Param("status") TicketStatus status,
                                     @Param("priority") TicketPriority priority,
                                     @Param("assignedToId") Long assignedToId,
+                                    @Param("searchName") String searchName,
                                     Pageable pageable);
 
     long countByStatus(TicketStatus status);

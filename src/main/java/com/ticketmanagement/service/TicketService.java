@@ -16,6 +16,7 @@ public interface TicketService {
     PageResponse<TicketResponse> getTickets(TicketStatus status,
                                             TicketPriority priority,
                                             Long assignedToId,
+                                            String searchName,
                                             Pageable pageable,
                                             String username);
 

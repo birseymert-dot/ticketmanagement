@@ -80,17 +80,21 @@ public class TicketServiceImpl implements TicketService {
     public PageResponse<TicketResponse> getTickets(TicketStatus status,
                                                    TicketPriority priority,
                                                    Long assignedToId,
+                                                   String searchName,
                                                    Pageable pageable,
                                                    String username) {
         User user = findUser(username);
 
+        // Bos arama metni filtre uygulanmamis sayilir
+        String search = (searchName == null || searchName.trim().isEmpty()) ? null : searchName.trim();
+
         Page<Ticket> page;
         if (user.getRole() == Role.ADMIN) {
             // ADMIN tum ticket'lari gorebilir
-            page = ticketRepository.findAllWithFilters(status, priority, assignedToId, pageable);
+            page = ticketRepository.findAllWithFilters(status, priority, assignedToId, search, pageable);
         } else {
             // USER sadece kendi olusturdugu veya kendisine atanan ticket'lari gorur
-            page = ticketRepository.findOwnWithFilters(user.getId(), status, priority, assignedToId, pageable);
+            page = ticketRepository.findOwnWithFilters(user.getId(), status, priority, assignedToId, search, pageable);
         }
         return PageResponse.from(page, TicketResponse::from);
     }
