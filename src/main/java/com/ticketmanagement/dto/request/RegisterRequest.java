@@ -20,10 +20,10 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Sifre bos olamaz")
-    @Size(min = 3, message = "Sifre en az 3 karakter olmalidir")
+    @Size(min = 6, message = "Sifre en az 6 karakter olmalidir")
     @Pattern(
-            regexp = ".*[^A-Za-zÇĞİÖŞÜçğıöşü].*",
-            message = "Sifre tamamen harflerden olusamaz; en az bir rakam veya sembol icermelidir"
+            regexp = "^(?=(?:.*[A-Za-zÇĞİÖŞÜçğıöşü]){3,}).*$",
+            message = "Sifre en az 3 harf icermelidir"
     )
     private String password;
 
@@ -51,3 +51,4 @@ public class RegisterRequest {
         this.password = password;
     }
 }
+

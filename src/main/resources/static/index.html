@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ticket Yönetim Sistemi</title>
+<title>Ticket YÃ¶netim Sistemi</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -240,31 +240,31 @@
     <div class="brand">
       <div class="brand-mark">TY</div>
       <div>
-        <div class="brand-name">Ticket Yönetim Sistemi</div>
+        <div class="brand-name">Ticket YÃ¶netim Sistemi</div>
         <div class="brand-sub">Destek Talepleri Paneli</div>
       </div>
     </div>
-    <p>Devam etmek için hesabınızla giriş yapın.</p>
+    <p>Devam etmek iÃ§in hesabÄ±nÄ±zla giriÅŸ yapÄ±n.</p>
     <div class="tabs">
-      <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Giriş Yap</button>
-      <button id="tabRegister" onclick="switchAuthTab('register')">Kayıt Ol</button>
+      <button id="tabLogin" class="active" onclick="switchAuthTab('login')">GiriÅŸ Yap</button>
+      <button id="tabRegister" onclick="switchAuthTab('register')">KayÄ±t Ol</button>
     </div>
     <form id="loginForm" onsubmit="doLogin(event)">
-      <label>Kullanıcı adı</label>
+      <label>KullanÄ±cÄ± adÄ±</label>
       <input id="loginUsername" required autocomplete="username">
-      <label>Şifre</label>
+      <label>Åifre</label>
       <input id="loginPassword" type="password" required autocomplete="current-password">
-      <button class="btn full" type="submit">Giriş Yap</button>
-      <div class="auth-note">Demo yönetici hesabı — kullanıcı adı: <b>admin</b>, şifre: <b>admin123</b></div>
+      <button class="btn full" type="submit">GiriÅŸ Yap</button>
+      <div class="auth-note">Demo yÃ¶netici hesabÄ± â€” kullanÄ±cÄ± adÄ±: <b>admin</b>, ÅŸifre: <b>admin123</b></div>
     </form>
     <form id="registerForm" class="hidden" onsubmit="doRegister(event)">
-      <label>Kullanıcı adı</label>
+      <label>KullanÄ±cÄ± adÄ±</label>
       <input id="regUsername" required minlength="3">
       <label>E-posta</label>
       <input id="regEmail" type="email" required>
-      <label>Şifre (en az 3 karakter, tamamen harf olamaz)</label>
-      <input id="regPassword" type="password" required minlength="3" pattern=".*[^A-Za-zÇĞİÖŞÜçğıöşü].*" title="Şifre en az 3 karakter olmalı ve en az bir rakam veya sembol içermelidir.">
-      <button class="btn full" type="submit">Hesap Oluştur</button>
+      <label>Şifre (en az 6 karakter, en az 3 harf)</label>
+      <input id="regPassword" type="password" required minlength="6" pattern="^(?=(?:.*[A-Za-zÇĞİÖŞÜçğıöşü]){3,}).*$" title="Şifre en az 6 karakter olmalı ve en az 3 harf içermelidir.">
+      <button class="btn full" type="submit">Hesap OluÅŸtur</button>
     </form>
   </div>
 </div>
@@ -275,31 +275,31 @@
     <div class="brand">
       <div class="brand-mark">TY</div>
       <div>
-        <div class="brand-name">Ticket Yönetim Sistemi</div>
+        <div class="brand-name">Ticket YÃ¶netim Sistemi</div>
       </div>
     </div>
     <nav>
-      <button id="navDashboard" class="active" onclick="showPage('dashboard')">Genel Bakış</button>
+      <button id="navDashboard" class="active" onclick="showPage('dashboard')">Genel BakÄ±ÅŸ</button>
       <button id="navTickets" onclick="showPage('tickets')">Ticket'lar</button>
-      <button id="navUsers" class="hidden" onclick="showPage('users')">Kullanıcılar</button>
-      <button id="navAudit" class="hidden" onclick="showPage('audit')">İşlem Kayıtları</button>
+      <button id="navUsers" class="hidden" onclick="showPage('users')">KullanÄ±cÄ±lar</button>
+      <button id="navAudit" class="hidden" onclick="showPage('audit')">Ä°ÅŸlem KayÄ±tlarÄ±</button>
     </nav>
     <div class="header-right">
       <div class="who">
         <div class="who-name" id="whoName"></div>
         <div class="who-role" id="whoRole"></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Çıkış</button>
+      <button class="logout-btn" onclick="logout()">Ã‡Ä±kÄ±ÅŸ</button>
     </div>
   </header>
 
   <main>
     <!-- Genel Bakis -->
     <section id="pageDashboard">
-      <div class="page-head"><div class="page-title">Genel Bakış</div></div>
+      <div class="page-head"><div class="page-title">Genel BakÄ±ÅŸ</div></div>
       <div class="stats" id="statCards"></div>
       <div class="card">
-        <h2>Son Oluşturulan Ticket'lar</h2>
+        <h2>Son OluÅŸturulan Ticket'lar</h2>
         <div id="lastTickets"></div>
       </div>
     </section>
@@ -317,19 +317,19 @@
         <div class="filters">
           <div><label>Durum</label>
             <select id="fStatus" onchange="state.page=0;loadTickets()">
-              <option value="">Tümü</option><option>OPEN</option><option>IN_PROGRESS</option><option>DONE</option>
+              <option value="">TÃ¼mÃ¼</option><option>OPEN</option><option>IN_PROGRESS</option><option>DONE</option>
             </select></div>
-          <div><label>Öncelik</label>
+          <div><label>Ã–ncelik</label>
             <select id="fPriority" onchange="state.page=0;loadTickets()">
-              <option value="">Tümü</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
+              <option value="">TÃ¼mÃ¼</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
             </select></div>
           <!-- Sadece ADMIN gorur: USER zaten yalnizca kendi ticket'larini listeler -->
-          <div id="fSearchWrap"><label>Kullanıcı ara (oluşturan / atanan)</label>
-            <input id="fSearchUser" type="text" placeholder="örn. yagmur" oninput="onTicketSearchInput()"></div>
+          <div id="fSearchWrap"><label>KullanÄ±cÄ± ara (oluÅŸturan / atanan)</label>
+            <input id="fSearchUser" type="text" placeholder="Ã¶rn. yagmur" oninput="onTicketSearchInput()"></div>
         </div>
         <div id="ticketList"></div>
         <div class="pager">
-          <button class="btn small secondary" id="prevBtn" onclick="state.page--;loadTickets()">Önceki</button>
+          <button class="btn small secondary" id="prevBtn" onclick="state.page--;loadTickets()">Ã–nceki</button>
           <span id="pageInfo"></span>
           <button class="btn small secondary" id="nextBtn" onclick="state.page++;loadTickets()">Sonraki</button>
         </div>
@@ -338,7 +338,7 @@
 
     <!-- Kullanicilar (admin) -->
     <section id="pageUsers" class="hidden">
-      <div class="page-head"><div class="page-title">Kullanıcılar</div></div>
+      <div class="page-head"><div class="page-title">KullanÄ±cÄ±lar</div></div>
       <div class="card">
         <div class="table-wrap"><table id="userTable"></table></div>
       </div>
@@ -346,11 +346,11 @@
 
     <!-- Islem kayitlari (admin) -->
     <section id="pageAudit" class="hidden">
-      <div class="page-head"><div class="page-title">İşlem Kayıtları</div></div>
+      <div class="page-head"><div class="page-title">Ä°ÅŸlem KayÄ±tlarÄ±</div></div>
       <div class="card">
         <div class="filters">
-          <div><label>Kayıtlarda ara (kullanıcı, işlem, detay)</label>
-            <input id="auditSearch" type="text" placeholder="örn. yagmur veya silindi" oninput="renderAudit()"></div>
+          <div><label>KayÄ±tlarda ara (kullanÄ±cÄ±, iÅŸlem, detay)</label>
+            <input id="auditSearch" type="text" placeholder="Ã¶rn. yagmur veya silindi" oninput="renderAudit()"></div>
         </div>
         <div class="table-wrap"><table id="auditTable"></table></div>
         <p class="empty" id="auditCount" style="margin-top:8px"></p>
@@ -363,20 +363,20 @@
 <div id="ticketModal" class="modal-bg hidden" onclick="if(event.target===this)closeTicketModal()">
   <div class="modal">
     <h2 id="modalTitle">Yeni Ticket</h2>
-    <div class="modal-sub">Zorunlu alanları doldurup kaydedin.</div>
+    <div class="modal-sub">Zorunlu alanlarÄ± doldurup kaydedin.</div>
     <form onsubmit="saveTicket(event)">
-      <label>Başlık</label>
+      <label>BaÅŸlÄ±k</label>
       <input id="tTitle" required maxlength="200">
-      <label>Açıklama</label>
+      <label>AÃ§Ä±klama</label>
       <textarea id="tDesc" required maxlength="2000"></textarea>
-      <label>Öncelik</label>
+      <label>Ã–ncelik</label>
       <select id="tPriority"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option></select>
-      <label>Atanacak kullanıcı adı (opsiyonel)</label>
-      <input id="tAssigned" type="text" list="userOptions" placeholder="örn. admin">
+      <label>Atanacak kullanÄ±cÄ± adÄ± (opsiyonel)</label>
+      <input id="tAssigned" type="text" list="userOptions" placeholder="Ã¶rn. admin">
       <datalist id="userOptions"></datalist>
       <div class="modal-actions">
         <button class="btn" type="submit">Kaydet</button>
-        <button class="btn secondary" type="button" onclick="closeTicketModal()">Vazgeç</button>
+        <button class="btn secondary" type="button" onclick="closeTicketModal()">VazgeÃ§</button>
       </div>
     </form>
   </div>
@@ -406,7 +406,7 @@ async function api(path, options = {}) {
   try { body = await res.json(); } catch (e) { /* bos govde */ }
   if (!res.ok) {
     let msg = (body && body.message) || ('Hata: HTTP ' + res.status);
-    if (body && body.fieldErrors) msg += ' — ' + Object.values(body.fieldErrors).join(', ');
+    if (body && body.fieldErrors) msg += ' â€” ' + Object.values(body.fieldErrors).join(', ');
     throw new Error(msg);
   }
   return body;
@@ -441,7 +441,7 @@ async function doRegister(e) {
   e.preventDefault();
   try {
     const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ username: $('regUsername').value, email: $('regEmail').value, password: $('regPassword').value }) });
-    toast(data.message || 'Kayıt oluşturuldu. Giriş yapabilirsiniz.', 'ok');
+    toast(data.message || 'KayÄ±t oluÅŸturuldu. GiriÅŸ yapabilirsiniz.', 'ok');
     $('loginUsername').value = data.username || $('regUsername').value.trim();
     $('loginPassword').value = '';
     $('regUsername').value = '';
@@ -457,7 +457,7 @@ function startSession(data) {
   $('authView').classList.add('hidden');
   $('appView').classList.remove('hidden');
   $('whoName').textContent = state.username;
-  $('whoRole').textContent = state.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı';
+  $('whoRole').textContent = state.role === 'ADMIN' ? 'YÃ¶netici' : 'KullanÄ±cÄ±';
   const isAdmin = state.role === 'ADMIN';
   $('navUsers').classList.toggle('hidden', !isAdmin);
   $('navAudit').classList.toggle('hidden', !isAdmin);
@@ -489,7 +489,7 @@ function showPage(name) {
 }
 
 /* ---------- genel bakis ---------- */
-const STATUS_TR = { OPEN: 'Açık', IN_PROGRESS: 'İşlemde', DONE: 'Tamamlandı' };
+const STATUS_TR = { OPEN: 'AÃ§Ä±k', IN_PROGRESS: 'Ä°ÅŸlemde', DONE: 'TamamlandÄ±' };
 
 async function loadDashboard() {
   try {
@@ -501,7 +501,7 @@ async function loadDashboard() {
     $('statCards').innerHTML = html;
     $('lastTickets').innerHTML = d.lastFiveTickets.length
       ? d.lastFiveTickets.map(t => ticketCard(t, 'd')).join('')
-      : '<p class="empty">Henüz ticket bulunmuyor.</p>';
+      : '<p class="empty">HenÃ¼z ticket bulunmuyor.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -522,8 +522,8 @@ async function loadTickets() {
     d.content.forEach(t => { state.ticketsById[t.id] = t; });
     $('ticketList').innerHTML = d.content.length
       ? d.content.map(t => ticketCard(t, 't')).join('')
-      : '<p class="empty">Gösterilecek ticket bulunamadı.</p>';
-    $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} — ${d.totalElements} kayıt` : '';
+      : '<p class="empty">GÃ¶sterilecek ticket bulunamadÄ±.</p>';
+    $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} â€” ${d.totalElements} kayÄ±t` : '';
     $('prevBtn').disabled = d.page <= 0;
     $('nextBtn').disabled = d.page >= d.totalPages - 1;
     for (const key of [...state.openComments]) {
@@ -551,7 +551,7 @@ function onTicketSearchInput() {
 
 /* ctx: 't' = Ticket'lar sayfasi, 'd' = Genel Bakis.
    Ayni ticket iki sayfada da gorunebildigi icin yorum kutusu
-   kimlikleri ctx ile ayristirilir — aksi halde kutu yanlis
+   kimlikleri ctx ile ayristirilir â€” aksi halde kutu yanlis
    sayfadaki (gizli) kopyada acilir ve calismiyor sanilir. */
 function ticketCard(t, ctx) {
   ctx = ctx || 't';
@@ -561,32 +561,32 @@ function ticketCard(t, ctx) {
   const isAdmin = state.role === 'ADMIN';
   let actions = '';
   if (!compact) {
-    if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">İşleme Al</button>`;
+    if (assignedToMe && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">Ä°ÅŸleme Al</button>`;
     if (assignedToMe && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">Tamamla</button>`;
-    if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
+    if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">DÃ¼zenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
-  // Genel Bakis'ta yorum butonu ticket'i olusturana gosterilmez —
+  // Genel Bakis'ta yorum butonu ticket'i olusturana gosterilmez â€”
   // olusturan kisi zaten Ticket'lar sayfasindan yorum yazabilir.
   const yorumGoster = compact ? !mine : true;
   if (yorumGoster) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorum yap</button>`;
   const key = ctx + '-' + t.id;
   return `
   <div class="ticket">
-    <div class="creator">Oluşturan: <b>${esc(t.createdBy)}</b></div>
+    <div class="creator">OluÅŸturan: <b>${esc(t.createdBy)}</b></div>
     <div class="top">
       <h3><span class="ticket-no">#${t.id}</span>${esc(t.title)}</h3>
       <div class="badges"><span class="badge b-${t.status}">${STATUS_TR[t.status] || t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
     </div>
     <div class="desc">${esc(t.description)}</div>
-    <div class="meta">Atanan: <b>${esc(t.assignedTo || '—')}</b> &nbsp;·&nbsp; Oluşturma: ${fmtDate(t.createdDate)} &nbsp;·&nbsp; Son güncelleme: ${fmtDate(t.updatedDate)}</div>
+    <div class="meta">Atanan: <b>${esc(t.assignedTo || 'â€”')}</b> &nbsp;Â·&nbsp; OluÅŸturma: ${fmtDate(t.createdDate)} &nbsp;Â·&nbsp; Son gÃ¼ncelleme: ${fmtDate(t.updatedDate)}</div>
     <div class="actions">${actions}</div>
     <div id="cbox-${key}" class="comments hidden">
       <div class="comments-title">Yorumlar</div>
       <div id="clist-${key}"></div>
       <form class="comment-form" onsubmit="addComment(event,'${ctx}',${t.id})">
-        <input id="cinput-${key}" placeholder="Yorumunuzu yazın..." required>
-        <button class="btn small" type="submit">Gönder</button>
+        <input id="cinput-${key}" placeholder="Yorumunuzu yazÄ±n..." required>
+        <button class="btn small" type="submit">GÃ¶nder</button>
       </form>
     </div>
   </div>`;
@@ -600,7 +600,7 @@ function openTicketModalById(id) {
 async function changeStatus(id, status) {
   try {
     await api(`/tickets/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
-    toast('Durum güncellendi: ' + (STATUS_TR[status] || status), 'ok');
+    toast('Durum gÃ¼ncellendi: ' + (STATUS_TR[status] || status), 'ok');
     state.page = 0;
     loadTickets();
     loadDashboard();
@@ -608,7 +608,7 @@ async function changeStatus(id, status) {
 }
 
 async function deleteTicket(id) {
-  if (!confirm('#' + id + ' numaralı ticket kalıcı olarak silinecek. Onaylıyor musunuz?')) return;
+  if (!confirm('#' + id + ' numaralÄ± ticket kalÄ±cÄ± olarak silinecek. OnaylÄ±yor musunuz?')) return;
   try {
     await api('/tickets/' + id, { method: 'DELETE' });
     toast('Ticket silindi.', 'ok');
@@ -621,7 +621,7 @@ async function deleteTicket(id) {
 /* ---------- ticket olustur / duzenle ---------- */
 function openTicketModal(t) {
   state.editingId = t ? t.id : null;
-  $('modalTitle').textContent = t ? ('Ticket Düzenle — #' + t.id) : 'Yeni Ticket';
+  $('modalTitle').textContent = t ? ('Ticket DÃ¼zenle â€” #' + t.id) : 'Yeni Ticket';
   $('tTitle').value = t ? t.title : '';
   $('tDesc').value = t ? t.description : '';
   $('tPriority').value = t ? t.priority : 'MEDIUM';
@@ -658,10 +658,10 @@ async function saveTicket(e) {
   try {
     if (state.editingId) {
       await api('/tickets/' + state.editingId, { method: 'PUT', body: JSON.stringify(body) });
-      toast('Ticket güncellendi.', 'ok');
+      toast('Ticket gÃ¼ncellendi.', 'ok');
     } else {
       await api('/tickets', { method: 'POST', body: JSON.stringify(body) });
-      toast('Ticket oluşturuldu.', 'ok');
+      toast('Ticket oluÅŸturuldu.', 'ok');
     }
     closeTicketModal();
     state.page = 0;
@@ -685,7 +685,7 @@ async function loadComments(ctx, id) {
     const list = await api(`/tickets/${id}/comments`);
     $('clist-' + ctx + '-' + id).innerHTML = list.length
       ? list.map(c => `<div class="comment"><b>${esc(c.author)}</b><span class="when">${fmtDate(c.createdDate)}</span><br>${esc(c.content)}</div>`).join('')
-      : '<p class="empty" style="font-size:12px">Henüz yorum yapılmamış.</p>';
+      : '<p class="empty" style="font-size:12px">HenÃ¼z yorum yapÄ±lmamÄ±ÅŸ.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -705,36 +705,36 @@ async function addComment(e, ctx, id) {
 async function loadUsers() {
   try {
     const users = await api('/users');
-    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Rol</th><th>Oluşturduğu</th><th>Atandığı</th><th>Yorumları</th><th>İşlem</th></tr>' +
+    $('userTable').innerHTML = '<tr><th>ID</th><th>KullanÄ±cÄ± AdÄ±</th><th>E-posta</th><th>Rol</th><th>OluÅŸturduÄŸu</th><th>AtandÄ±ÄŸÄ±</th><th>YorumlarÄ±</th><th>Ä°ÅŸlem</th></tr>' +
       users.map(u => `<tr>
         <td>${u.id}</td>
         <td><b>${esc(u.username)}</b></td>
         <td>${esc(u.email)}</td>
-        <td><span class="badge r-${u.role}">${u.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</span></td>
+        <td><span class="badge r-${u.role}">${u.role === 'ADMIN' ? 'YÃ¶netici' : 'KullanÄ±cÄ±'}</span></td>
         <td>${u.createdTicketCount}</td>
         <td>${u.assignedTicketCount}</td>
         <td>${u.commentCount}</td>
-        <td>${u.username === state.username ? '<span style="color:var(--faint);font-size:12px">—</span>' : `<button class="btn small danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Sil</button>`}</td>
+        <td>${u.username === state.username ? '<span style="color:var(--faint);font-size:12px">â€”</span>' : `<button class="btn small danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Sil</button>`}</td>
       </tr>`).join('');
   } catch (err) { toast(err.message, 'err'); }
 }
 
 async function deleteUser(id, username) {
-  if (!confirm(`"${username}" kullanıcısı silinecek. Açtığı ticket'lar ve yorumları da silinir, kendisine atanmış ticket'lar atamasız kalır. Onaylıyor musunuz?`)) return;
+  if (!confirm(`"${username}" kullanÄ±cÄ±sÄ± silinecek. AÃ§tÄ±ÄŸÄ± ticket'lar ve yorumlarÄ± da silinir, kendisine atanmÄ±ÅŸ ticket'lar atamasÄ±z kalÄ±r. OnaylÄ±yor musunuz?`)) return;
   try {
     await api('/users/' + id, { method: 'DELETE' });
-    toast('Kullanıcı silindi.', 'ok');
+    toast('KullanÄ±cÄ± silindi.', 'ok');
     loadUsers();
   } catch (err) { toast(err.message, 'err'); }
 }
 
 const ACTION_TR = {
-  TICKET_CREATED: 'Ticket oluşturuldu',
-  TICKET_UPDATED: 'Ticket güncellendi',
+  TICKET_CREATED: 'Ticket oluÅŸturuldu',
+  TICKET_UPDATED: 'Ticket gÃ¼ncellendi',
   TICKET_DELETED: 'Ticket silindi',
-  STATUS_CHANGED: 'Durum değişikliği',
-  LOGIN: 'Oturum açma',
-  USER_DELETED: 'Kullanıcı silindi'
+  STATUS_CHANGED: 'Durum deÄŸiÅŸikliÄŸi',
+  LOGIN: 'Oturum aÃ§ma',
+  USER_DELETED: 'KullanÄ±cÄ± silindi'
 };
 
 async function loadAudit() {
@@ -754,11 +754,11 @@ function renderAudit() {
     (l.details || '').toLowerCase().includes(query) ||
     String(l.ticketId || '').includes(query)
   );
-  $('auditTable').innerHTML = '<tr><th>Zaman</th><th>İşlem</th><th>Kullanıcı</th><th>Ticket</th><th>Detay</th></tr>' +
-    filtered.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td><b>${esc(l.username)}</b></td><td>${l.ticketId ?? '—'}</td><td>${esc(l.details)}</td></tr>`).join('');
+  $('auditTable').innerHTML = '<tr><th>Zaman</th><th>Ä°ÅŸlem</th><th>KullanÄ±cÄ±</th><th>Ticket</th><th>Detay</th></tr>' +
+    filtered.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td><b>${esc(l.username)}</b></td><td>${l.ticketId ?? 'â€”'}</td><td>${esc(l.details)}</td></tr>`).join('');
   $('auditCount').textContent = query
-    ? `${filtered.length} / ${logs.length} kayıt eşleşti`
-    : `${logs.length} kayıt`;
+    ? `${filtered.length} / ${logs.length} kayÄ±t eÅŸleÅŸti`
+    : `${logs.length} kayÄ±t`;
 }
 
 /* ---------- oturumu hatirla ---------- */
@@ -769,3 +769,4 @@ function renderAudit() {
 </script>
 </body>
 </html>
+
