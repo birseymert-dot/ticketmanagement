@@ -566,11 +566,10 @@ function ticketCard(t, ctx) {
     if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
-  // Genel Bakis'ta yorum butonu ticket'i olusturana gosterilmez —
-  // olusturan kisi zaten Ticket'lar sayfasindan yorum yazabilir.
-  // ADMIN istisna: kendi ticket'i dahil her yerde yorum yapabilir.
-  const yorumGoster = compact ? (isAdmin || !mine) : true;
-  if (yorumGoster) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorum yap</button>`;
+  // Yorumlar tek yerden yonetilir: SADECE Genel Bakis'ta gosterilir
+  // (Ticket'lar sayfasinda tekrar etmemesi icin). Admin ve user icin ayni kural;
+  // kimin hangi ticket'a yorum yazabilecegini backend belirler.
+  if (compact) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorum yap</button>`;
   const key = ctx + '-' + t.id;
   return `
   <div class="ticket">
