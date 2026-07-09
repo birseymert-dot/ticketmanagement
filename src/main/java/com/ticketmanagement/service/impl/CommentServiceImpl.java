@@ -71,17 +71,14 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Comment erisimi ticket goruntuleme kuraliyla ayni tutulur:
-     * ADMIN tum ticket yorumlarini gorebilir/ekleyebilir.
-     * USER sadece kendi olusturdugu veya kendisine atanan ticket uzerinde yorum islemi yapabilir.
+     * ADMIN tum ticket'larda (kendi ticket'lari dahil) yorum gorebilir/ekleyebilir.
+     * USER sadece kendi olusturdugu ticket uzerinde yorum islemi yapabilir.
      */
     private void validateTicketAccess(Ticket ticket, User user) {
         if (user.getRole() == Role.ADMIN) {
             return;
         }
-        boolean isCreator = ticket.getCreatedBy().getId().equals(user.getId());
-        boolean isAssignee = ticket.getAssignedTo() != null
-                && ticket.getAssignedTo().getId().equals(user.getId());
-        if (!isCreator && !isAssignee) {
+        if (!ticket.getCreatedBy().getId().equals(user.getId())) {
             throw new ForbiddenException("Bu ticket icin yorum yetkiniz yok");
         }
     }

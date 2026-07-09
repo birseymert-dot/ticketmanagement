@@ -568,7 +568,8 @@ function ticketCard(t, ctx) {
   }
   // Genel Bakis'ta yorum butonu ticket'i olusturana gosterilmez —
   // olusturan kisi zaten Ticket'lar sayfasindan yorum yazabilir.
-  const yorumGoster = compact ? !mine : true;
+  // ADMIN istisna: kendi ticket'i dahil her yerde yorum yapabilir.
+  const yorumGoster = compact ? (isAdmin || !mine) : true;
   if (yorumGoster) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorum yap</button>`;
   const key = ctx + '-' + t.id;
   return `

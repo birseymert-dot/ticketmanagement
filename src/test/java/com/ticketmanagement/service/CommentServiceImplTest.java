@@ -84,13 +84,27 @@ class CommentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Assigned kullanici yorum ekleyebilmelidir")
-    void addComment_shouldAllowAssignee() {
+    @DisplayName("Atanan kullanici (olusturan degilse) yorum ekleyememelidir")
+    void addComment_shouldRejectAssignee() {
         CommentRequest request = new CommentRequest();
         request.setContent("Inceliyorum");
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findByUsername("assignee")).thenReturn(Optional.of(assignee));
+
+        assertThrows(ForbiddenException.class,
+                () -> commentService.addComment(10L, request, "assignee"));
+        verify(commentRepository, never()).save(any(Comment.class));
+    }
+
+    @Test
+    @DisplayName("Ticket'i olusturan kullanici yorum ekleyebilmelidir")
+    void addComment_shouldAllowCreator() {
+        CommentRequest request = new CommentRequest();
+        request.setContent("Guncelleme var mi?");
+
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(userRepository.findByUsername("creator")).thenReturn(Optional.of(creator));
         when(commentRepository.save(any(Comment.class))).thenAnswer(inv -> {
             Comment comment = inv.getArgument(0);
             comment.setId(99L);
@@ -98,11 +112,33 @@ class CommentServiceImplTest {
             return comment;
         });
 
-        CommentResponse response = commentService.addComment(10L, request, "assignee");
+        CommentResponse response = commentService.addComment(10L, request, "creator");
 
-        assertEquals("Inceliyorum", response.getContent());
-        assertEquals("assignee", response.getAuthor());
+        assertEquals("Guncelleme var mi?", response.getContent());
+        assertEquals("creator", response.getAuthor());
         assertEquals(10L, response.getTicketId());
+    }
+
+    @Test
+    @DisplayName("ADMIN her ticket'a (kendi ticket'i dahil) yorum ekleyebilmelidir")
+    void addComment_shouldAllowAdminOnAnyTicket() {
+        User admin = buildUser(4L, "admin", Role.ADMIN);
+        CommentRequest request = new CommentRequest();
+        request.setContent("Admin notu");
+
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(commentRepository.save(any(Comment.class))).thenAnswer(inv -> {
+            Comment comment = inv.getArgument(0);
+            comment.setId(100L);
+            comment.setCreatedDate(LocalDateTime.now());
+            return comment;
+        });
+
+        CommentResponse response = commentService.addComment(10L, request, "admin");
+
+        assertEquals("Admin notu", response.getContent());
+        assertEquals("admin", response.getAuthor());
     }
 
     private User buildUser(Long id, String username, Role role) {

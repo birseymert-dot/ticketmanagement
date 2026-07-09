@@ -107,7 +107,8 @@ public class TicketServiceImpl implements TicketService {
         User user = findUser(username);
         Ticket ticket = findTicket(id);
 
-        if (user.getRole() != Role.ADMIN && !isCreatorOrAssignee(ticket, user)) {
+        // USER sadece kendi olusturdugu ticket'i goruntuleyebilir (ADMIN hepsini)
+        if (user.getRole() != Role.ADMIN && !isCreator(ticket, user)) {
             throw new ForbiddenException("Bu ticket'i goruntuleme yetkiniz yok");
         }
         return TicketResponse.from(ticket);
@@ -214,10 +215,7 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new NotFoundException("Ticket bulunamadi: " + id));
     }
 
-    private boolean isCreatorOrAssignee(Ticket ticket, User user) {
-        boolean isCreator = ticket.getCreatedBy().getId().equals(user.getId());
-        boolean isAssignee = ticket.getAssignedTo() != null
-                && ticket.getAssignedTo().getId().equals(user.getId());
-        return isCreator || isAssignee;
+    private boolean isCreator(Ticket ticket, User user) {
+        return ticket.getCreatedBy().getId().equals(user.getId());
     }
 }
