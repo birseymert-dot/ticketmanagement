@@ -9,7 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,9 +31,12 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initAdmin(UserRepository userRepository,
                                        PasswordEncoder passwordEncoder,
-                                       JdbcTemplate jdbcTemplate) {
+                                       JdbcTemplate jdbcTemplate,
+                                       PlatformTransactionManager transactionManager) {
         return args -> {
             fixAuditActionColumn(jdbcTemplate);
+            new TransactionTemplate(transactionManager)
+                    .executeWithoutResult(status -> compactUserIds(jdbcTemplate));
             deduplicateUsernames(userRepository);
 
             if (!userRepository.existsByUsernameIgnoreCase("admin")) {
@@ -40,9 +46,60 @@ public class DataInitializer {
                         passwordEncoder.encode("admin123"),
                         Role.ADMIN
                 );
+                admin.setId(nextFreeUserId(userRepository));
                 userRepository.save(admin);
             }
         };
+    }
+
+    /** 1'den baslayarak kullanilmayan en kucuk kullanici ID'sini bulur. */
+    private Long nextFreeUserId(UserRepository userRepository) {
+        long expected = 1;
+        for (Long id : userRepository.findAllIds()) {
+            if (id == null || id < expected) continue;
+            if (id != expected) break;
+            expected++;
+        }
+        return expected;
+    }
+
+    /**
+     * Kullanici ID'lerini 1'den baslayarak bosluksuz hale getirir.
+     * Testler ve silinen kayitlar nedeniyle olusan atlamalari (orn. yeni
+     * kullanicinin 65 numara almasi) duzeltir. Ticket ve yorumlardaki
+     * kullanici baglantilari da ayni islemde guncellendigi icin veri
+     * butunlugu korunur. Tek transaction icinde calisir.
+     */
+    private void compactUserIds(JdbcTemplate jdbcTemplate) {
+        List<Long> ids = jdbcTemplate.queryForList("SELECT ID FROM USERS ORDER BY ID", Long.class);
+
+        List<long[]> moves = new ArrayList<>();
+        long expected = 1;
+        for (Long id : ids) {
+            if (id != expected) {
+                moves.add(new long[]{id, expected});
+            }
+            expected++;
+        }
+        if (moves.isEmpty()) {
+            return;
+        }
+
+        // Ayni transaction'daki baglanti uzerinde FK kontrolu gecici kapatilir;
+        // kullanici + ticket + yorum guncellemeleri birlikte yapilip geri acilir.
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        try {
+            for (long[] move : moves) {
+                long from = move[0];
+                long to = move[1];
+                jdbcTemplate.update("UPDATE USERS SET ID = ? WHERE ID = ?", to, from);
+                jdbcTemplate.update("UPDATE TICKETS SET CREATED_BY_ID = ? WHERE CREATED_BY_ID = ?", to, from);
+                jdbcTemplate.update("UPDATE TICKETS SET ASSIGNED_TO_ID = ? WHERE ASSIGNED_TO_ID = ?", to, from);
+                jdbcTemplate.update("UPDATE COMMENTS SET AUTHOR_ID = ? WHERE AUTHOR_ID = ?", to, from);
+            }
+        } finally {
+            jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+        }
     }
 
     /**

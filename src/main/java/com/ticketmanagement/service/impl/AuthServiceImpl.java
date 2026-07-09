@@ -74,6 +74,8 @@ public class AuthServiceImpl implements AuthService {
                 passwordEncoder.encode(request.getPassword()),
                 Role.USER
         );
+        // En kucuk bos ID atanir; silinen kullanicilarin numaralari yeniden kullanilir
+        user.setId(nextFreeUserId());
         userRepository.save(user);
 
         return new RegisterResponse("Kayit olusturuldu. Giris yapabilirsiniz.", user.getUsername(), user.getRole());
@@ -105,6 +107,17 @@ public class AuthServiceImpl implements AuthService {
      */
     private String canonical(String value) {
         return value == null ? null : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    /** 1'den baslayarak kullanilmayan en kucuk kullanici ID'sini bulur. */
+    private Long nextFreeUserId() {
+        long expected = 1;
+        for (Long id : userRepository.findAllIds()) {
+            if (id == null || id < expected) continue;
+            if (id != expected) break;
+            expected++;
+        }
+        return expected;
     }
 
     /** Genel e-posta format dogrulamasi (is kurali, service katmaninda). */

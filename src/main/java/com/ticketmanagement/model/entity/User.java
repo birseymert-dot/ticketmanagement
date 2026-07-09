@@ -5,8 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -14,8 +12,13 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 public class User {
 
+    /**
+     * Kullanici ID'leri veritabani sayaciyla degil, uygulama tarafindan
+     * atanir: yeni kayit her zaman en kucuk bos ID'yi alir. Boylece
+     * silinen kullanicilarin numaralari yeniden kullanilir ve numaralar
+     * sistematik ilerler (bkz. AuthServiceImpl.nextFreeUserId).
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
