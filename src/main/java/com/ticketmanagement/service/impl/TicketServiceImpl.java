@@ -160,13 +160,26 @@ public class TicketServiceImpl implements TicketService {
         if (!current.canTransitionTo(target)) {
             throw new BadRequestException(
                     "Gecersiz status gecisi: " + current + " -> " + target
-                            + " (izin verilen gecisler: OPEN -> IN_PROGRESS, IN_PROGRESS -> DONE)");
+                            + " (izin verilen gecisler: OPEN -> IN_PROGRESS/HOLD, IN_PROGRESS -> DONE/HOLD, HOLD -> IN_PROGRESS/OPEN)");
+        }
+
+        // HOLD kurali: beklemeye alinirken neden zorunludur ve ticket uzerinde gosterilir;
+        // beklemeden cikildiginda neden temizlenir.
+        String auditDetail = "Status degisti: " + current + " -> " + target;
+        if (target == TicketStatus.HOLD) {
+            String reason = request.getReason() == null ? "" : request.getReason().trim();
+            if (reason.isEmpty()) {
+                throw new BadRequestException("Ticket beklemeye alinirken neden belirtilmesi zorunludur");
+            }
+            ticket.setHoldReason(reason);
+            auditDetail += " (Neden: " + reason + ")";
+        } else {
+            ticket.setHoldReason(null);
         }
 
         ticket.setStatus(target);
         Ticket saved = ticketRepository.save(ticket);
-        auditLogService.log(AuditAction.STATUS_CHANGED, username, saved.getId(),
-                "Status degisti: " + current + " -> " + target);
+        auditLogService.log(AuditAction.STATUS_CHANGED, username, saved.getId(), auditDetail);
         return TicketResponse.from(saved);
     }
 

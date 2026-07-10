@@ -116,6 +116,14 @@ public class DataInitializer {
             // Tablo henuz yoksa veya veritabani desteklemiyorsa sessizce gecilir;
             // yeni olusan tablolarda sorun zaten olusmaz.
         }
+        // Ayni sorun TICKETS.STATUS icin de gecerli: eski veritabanlarinda kolon
+        // o gunki enum degerleriyle sinirli ENUM tipinde olusmus olabilir;
+        // HOLD gibi sonradan eklenen degerler yazilamaz. VARCHAR'a cevrilir.
+        try {
+            jdbcTemplate.execute("ALTER TABLE TICKETS ALTER COLUMN STATUS VARCHAR(30) NOT NULL");
+        } catch (Exception e) {
+            // sessizce gecilir
+        }
     }
 
     /**

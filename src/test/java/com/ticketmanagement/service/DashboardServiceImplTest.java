@@ -51,6 +51,7 @@ class DashboardServiceImplTest {
         when(ticketRepository.countVisibleByUserId(1L)).thenReturn(1L);
         when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.OPEN)).thenReturn(1L);
         when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.IN_PROGRESS)).thenReturn(0L);
+        when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.HOLD)).thenReturn(0L);
         when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.DONE)).thenReturn(0L);
         when(ticketRepository.findVisibleTopByUserId(eq(1L), any(Pageable.class)))
                 .thenReturn(List.of(visibleTicket));
@@ -76,6 +77,7 @@ class DashboardServiceImplTest {
         when(ticketRepository.count()).thenReturn(1L);
         when(ticketRepository.countByStatus(TicketStatus.OPEN)).thenReturn(1L);
         when(ticketRepository.countByStatus(TicketStatus.IN_PROGRESS)).thenReturn(0L);
+        when(ticketRepository.countByStatus(TicketStatus.HOLD)).thenReturn(0L);
         when(ticketRepository.countByStatus(TicketStatus.DONE)).thenReturn(0L);
         when(ticketRepository.findTop5ByOrderByCreatedDateDesc()).thenReturn(List.of(ticket));
 

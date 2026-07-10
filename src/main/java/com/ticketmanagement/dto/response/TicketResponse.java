@@ -13,6 +13,7 @@ public class TicketResponse {
     private String description;
     private TicketStatus status;
     private TicketPriority priority;
+    private String holdReason;
     private String createdBy;
     private String assignedTo;
     private LocalDateTime createdDate;
@@ -25,6 +26,7 @@ public class TicketResponse {
         response.description = ticket.getDescription();
         response.status = ticket.getStatus();
         response.priority = ticket.getPriority();
+        response.holdReason = ticket.getHoldReason();
         response.createdBy = ticket.getCreatedBy().getUsername();
         response.assignedTo = ticket.getAssignedTo() != null ? ticket.getAssignedTo().getUsername() : null;
         response.createdDate = ticket.getCreatedDate();
@@ -50,6 +52,10 @@ public class TicketResponse {
 
     public TicketPriority getPriority() {
         return priority;
+    }
+
+    public String getHoldReason() {
+        return holdReason;
     }
 
     public String getCreatedBy() {

@@ -40,6 +40,10 @@ public class Ticket {
     @Column(nullable = false)
     private TicketPriority priority;
 
+    /** Ticket HOLD durumundayken zorunlu olan bekleme nedeni; beklemeden cikinca temizlenir. */
+    @Column(length = 500)
+    private String holdReason;
+
     /** Is kurali #6: createdBy alani olusturulduktan sonra degistirilemez. */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by_id", nullable = false, updatable = false)
@@ -95,6 +99,14 @@ public class Ticket {
 
     public void setStatus(TicketStatus status) {
         this.status = status;
+    }
+
+    public String getHoldReason() {
+        return holdReason;
+    }
+
+    public void setHoldReason(String holdReason) {
+        this.holdReason = holdReason;
     }
 
     public TicketPriority getPriority() {

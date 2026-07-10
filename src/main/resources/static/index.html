@@ -167,7 +167,16 @@
   .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .b-OPEN        { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
   .b-IN_PROGRESS { background: #fffbeb; color: #b45309; border-color: #fef3c7; }
+  .b-HOLD        { background: #f5f3ff; color: #6d28d9; border-color: #ede9fe; }
   .b-DONE        { background: #f0fdf4; color: #15803d; border-color: #dcfce7; }
+
+  /* Beklemeye alinan ticket'in nedeni, kartin hemen altinda gosterilir */
+  .hold-note {
+    margin: 8px 0 2px; padding: 9px 12px; border-radius: var(--radius);
+    background: #f5f3ff; border: 1px solid #ede9fe; border-left: 3px solid #7c3aed;
+    font-size: 12.5px; color: #4c1d95;
+  }
+  .hold-note b { font-weight: 600; }
   .b-LOW         { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
   .b-MEDIUM      { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
   .b-HIGH        { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
@@ -317,7 +326,7 @@
         <div class="filters">
           <div><label>Durum</label>
             <select id="fStatus" onchange="state.page=0;loadTickets()">
-              <option value="">Tümü</option><option>OPEN</option><option>IN_PROGRESS</option><option>DONE</option>
+              <option value="">Tümü</option><option>OPEN</option><option>IN_PROGRESS</option><option>HOLD</option><option>DONE</option>
             </select></div>
           <div><label>Öncelik</label>
             <select id="fPriority" onchange="state.page=0;loadTickets()">
@@ -377,6 +386,22 @@
       <div class="modal-actions">
         <button class="btn" type="submit">Kaydet</button>
         <button class="btn secondary" type="button" onclick="closeTicketModal()">Vazgeç</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Beklemeye alma (HOLD) modali -->
+<div id="holdModal" class="modal-bg hidden" onclick="if(event.target===this)closeHoldModal()">
+  <div class="modal">
+    <h2>Ticket'ı Beklemeye Al</h2>
+    <div class="modal-sub">Lütfen ticket'ın neden beklemeye alındığını açıklayınız. Bu açıklama, ticket üzerinde tüm ilgililere görüntülenecektir.</div>
+    <form onsubmit="confirmHold(event)">
+      <label>Bekleme Nedeni</label>
+      <textarea id="holdReason" required maxlength="500" placeholder="örn. Tedarikçiden dönüş bekleniyor; ilgili birimin onayı alınamadı."></textarea>
+      <div class="modal-actions">
+        <button class="btn" type="submit">Beklemeye Al</button>
+        <button class="btn secondary" type="button" onclick="closeHoldModal()">Vazgeç</button>
       </div>
     </form>
   </div>
@@ -489,7 +514,7 @@ function showPage(name) {
 }
 
 /* ---------- genel bakis ---------- */
-const STATUS_TR = { OPEN: 'Açık', IN_PROGRESS: 'İşlemde', DONE: 'Tamamlandı' };
+const STATUS_TR = { OPEN: 'Açık', IN_PROGRESS: 'İşlemde', HOLD: 'Beklemede', DONE: 'Tamamlandı' };
 
 async function loadDashboard() {
   try {
@@ -563,6 +588,8 @@ function ticketCard(t, ctx) {
   if (!compact) {
     if (isAdmin && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">İşleme Al</button>`;
     if (isAdmin && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">Tamamla</button>`;
+    if (isAdmin && t.status === 'HOLD') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">Beklemeden Al</button>`;
+    if (isAdmin && (t.status === 'OPEN' || t.status === 'IN_PROGRESS')) actions += `<button class="btn small secondary" onclick="openHoldModal(${t.id})">Beklemeye Al</button>`;
     if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
@@ -579,6 +606,7 @@ function ticketCard(t, ctx) {
       <div class="badges"><span class="badge b-${t.status}">${STATUS_TR[t.status] || t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
     </div>
     <div class="desc">${esc(t.description)}</div>
+    ${t.status === 'HOLD' && t.holdReason ? `<div class="hold-note"><b>Bekleme nedeni:</b> ${esc(t.holdReason)}</div>` : ''}
     <div class="meta">Atanan: <b>${esc(t.assignedTo || '—')}</b> &nbsp;·&nbsp; Oluşturma: ${fmtDate(t.createdDate)} &nbsp;·&nbsp; Son güncelleme: ${fmtDate(t.updatedDate)}</div>
     <div class="actions">${actions}</div>
     <div id="cbox-${key}" class="comments hidden">
@@ -601,6 +629,30 @@ async function changeStatus(id, status) {
   try {
     await api(`/tickets/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
     toast('Durum güncellendi: ' + (STATUS_TR[status] || status), 'ok');
+    state.page = 0;
+    loadTickets();
+    loadDashboard();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+/* ---------- beklemeye alma (HOLD) ---------- */
+function openHoldModal(id) {
+  state.holdTicketId = id;
+  $('holdReason').value = '';
+  $('holdModal').classList.remove('hidden');
+  $('holdReason').focus();
+}
+
+function closeHoldModal() { $('holdModal').classList.add('hidden'); }
+
+async function confirmHold(e) {
+  e.preventDefault();
+  const reason = $('holdReason').value.trim();
+  if (!reason) { toast('Lütfen bekleme nedenini belirtiniz.', 'err'); return; }
+  try {
+    await api(`/tickets/${state.holdTicketId}/status`, { method: 'PATCH', body: JSON.stringify({ status: 'HOLD', reason }) });
+    closeHoldModal();
+    toast('Ticket beklemeye alındı.', 'ok');
     state.page = 0;
     loadTickets();
     loadDashboard();

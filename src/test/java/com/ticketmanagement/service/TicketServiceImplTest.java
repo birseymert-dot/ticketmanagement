@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -168,6 +169,55 @@ class TicketServiceImplTest {
         assertThrows(BadRequestException.class,
                 () -> ticketService.updateStatus(10L, request, "admin"));
         verify(ticketRepository, never()).save(any(Ticket.class));
+    }
+
+    @Test
+    @DisplayName("Neden belirtilmeden ticket beklemeye alinamaz")
+    void updateStatus_shouldRejectHoldWithoutReason() {
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.HOLD);
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+
+        assertThrows(BadRequestException.class,
+                () -> ticketService.updateStatus(10L, request, "admin"));
+        verify(ticketRepository, never()).save(any(Ticket.class));
+    }
+
+    @Test
+    @DisplayName("Neden belirtilerek beklemeye alinabilir; neden ticket'ta saklanir")
+    void updateStatus_shouldAllowHoldWithReason() {
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.HOLD);
+        request.setReason("Tedarikciden donus bekleniyor");
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketResponse response = ticketService.updateStatus(10L, request, "admin");
+
+        assertEquals(TicketStatus.HOLD, response.getStatus());
+        assertEquals("Tedarikciden donus bekleniyor", response.getHoldReason());
+    }
+
+    @Test
+    @DisplayName("Beklemeden cikinca bekleme nedeni temizlenir")
+    void updateStatus_shouldClearReasonWhenLeavingHold() {
+        ticket.setStatus(TicketStatus.HOLD);
+        ticket.setHoldReason("Eski neden");
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.IN_PROGRESS);
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketResponse response = ticketService.updateStatus(10L, request, "admin");
+
+        assertEquals(TicketStatus.IN_PROGRESS, response.getStatus());
+        assertNull(response.getHoldReason());
     }
 
     @Test
