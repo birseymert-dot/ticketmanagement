@@ -203,12 +203,12 @@ class TicketServiceImplTest {
     }
 
     @Test
-    @DisplayName("Beklemeden cikinca bekleme nedeni temizlenir")
-    void updateStatus_shouldClearReasonWhenLeavingHold() {
+    @DisplayName("Beklemeden cikan ticket OPEN'a doner ve neden temizlenir")
+    void updateStatus_shouldReturnToOpenAndClearReasonWhenLeavingHold() {
         ticket.setStatus(TicketStatus.HOLD);
         ticket.setHoldReason("Eski neden");
         StatusUpdateRequest request = new StatusUpdateRequest();
-        request.setStatus(TicketStatus.IN_PROGRESS);
+        request.setStatus(TicketStatus.OPEN);
 
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
@@ -216,8 +216,70 @@ class TicketServiceImplTest {
 
         TicketResponse response = ticketService.updateStatus(10L, request, "admin");
 
-        assertEquals(TicketStatus.IN_PROGRESS, response.getStatus());
+        assertEquals(TicketStatus.OPEN, response.getStatus());
         assertNull(response.getHoldReason());
+    }
+
+    @Test
+    @DisplayName("Beklemedeki ticket dogrudan isleme alinamaz (HOLD -> IN_PROGRESS yasak)")
+    void updateStatus_shouldRejectProcessingWhileOnHold() {
+        ticket.setStatus(TicketStatus.HOLD);
+        ticket.setHoldReason("Beklemede");
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.IN_PROGRESS);
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+
+        assertThrows(BadRequestException.class,
+                () -> ticketService.updateStatus(10L, request, "admin"));
+        verify(ticketRepository, never()).save(any(Ticket.class));
+    }
+
+    @Test
+    @DisplayName("Ticket'i olusturan USER kendi ticket'ini beklemeye alabilir")
+    void updateStatus_shouldAllowCreatorToHoldOwnTicket() {
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.HOLD);
+        request.setReason("Konu netlesene kadar bekletiyorum");
+
+        when(userRepository.findByUsername("creator")).thenReturn(Optional.of(creator));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketResponse response = ticketService.updateStatus(10L, request, "creator");
+
+        assertEquals(TicketStatus.HOLD, response.getStatus());
+        assertEquals("Konu netlesene kadar bekletiyorum", response.getHoldReason());
+    }
+
+    @Test
+    @DisplayName("Olusturan USER bile ticket'i isleme alamaz (sadece ADMIN)")
+    void updateStatus_shouldRejectCreatorProcessing() {
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.IN_PROGRESS);
+
+        when(userRepository.findByUsername("creator")).thenReturn(Optional.of(creator));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateStatus(10L, request, "creator"));
+        verify(ticketRepository, never()).save(any(Ticket.class));
+    }
+
+    @Test
+    @DisplayName("Baskasinin ticket'ini USER beklemeye alamaz")
+    void updateStatus_shouldRejectNonCreatorHold() {
+        StatusUpdateRequest request = new StatusUpdateRequest();
+        request.setStatus(TicketStatus.HOLD);
+        request.setReason("neden");
+
+        when(userRepository.findByUsername("other")).thenReturn(Optional.of(otherUser));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateStatus(10L, request, "other"));
+        verify(ticketRepository, never()).save(any(Ticket.class));
     }
 
     @Test

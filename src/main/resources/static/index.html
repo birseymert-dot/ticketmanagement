@@ -586,10 +586,13 @@ function ticketCard(t, ctx) {
   const isAdmin = state.role === 'ADMIN';
   let actions = '';
   if (!compact) {
+    // Isleme alma / tamamlama: sadece ADMIN. Beklemedeki ticket dogrudan
+    // isleme alinamaz; once beklemeden cikarilir (OPEN'a doner).
     if (isAdmin && t.status === 'OPEN') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">İşleme Al</button>`;
     if (isAdmin && t.status === 'IN_PROGRESS') actions += `<button class="btn small" onclick="changeStatus(${t.id},'DONE')">Tamamla</button>`;
-    if (isAdmin && t.status === 'HOLD') actions += `<button class="btn small" onclick="changeStatus(${t.id},'IN_PROGRESS')">Beklemeden Al</button>`;
-    if (isAdmin && (t.status === 'OPEN' || t.status === 'IN_PROGRESS')) actions += `<button class="btn small secondary" onclick="openHoldModal(${t.id})">Beklemeye Al</button>`;
+    // Beklemeye alma / beklemeden alma: ADMIN veya ticket'i olusturan kullanici.
+    if ((isAdmin || mine) && t.status === 'HOLD') actions += `<button class="btn small" onclick="changeStatus(${t.id},'OPEN')">Beklemeden Al</button>`;
+    if ((isAdmin || mine) && (t.status === 'OPEN' || t.status === 'IN_PROGRESS')) actions += `<button class="btn small secondary" onclick="openHoldModal(${t.id})">Beklemeye Al</button>`;
     if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }

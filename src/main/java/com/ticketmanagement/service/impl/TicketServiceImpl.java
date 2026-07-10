@@ -147,20 +147,32 @@ public class TicketServiceImpl implements TicketService {
         User user = findUser(username);
         Ticket ticket = findTicket(id);
 
-        // Status degisikligi yalnizca ADMIN tarafindan yapilabilir.
-        // (Dokumanin 5. kurali "atanan kullanici degistirir" seklindeydi;
-        // proje yonetimi talebiyle yetki ADMIN'e tasindi.)
-        if (user.getRole() != Role.ADMIN) {
-            throw new ForbiddenException("Ticket durumunu sadece ADMIN degistirebilir");
-        }
-
-        // Is kurali #4: gecerli status gecis kontrolu
         TicketStatus current = ticket.getStatus();
         TicketStatus target = request.getStatus();
+
+        // Yetki kurallari:
+        // - Beklemeye alma (HOLD) ve beklemeden alma (HOLD -> OPEN):
+        //   ADMIN veya ticket'i olusturan kullanici yapabilir.
+        // - Isleme alma (IN_PROGRESS) ve tamamlama (DONE): sadece ADMIN.
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+        boolean isCreator = isCreator(ticket, user);
+        boolean holdIslemi = target == TicketStatus.HOLD
+                || (current == TicketStatus.HOLD && target == TicketStatus.OPEN);
+        if (holdIslemi) {
+            if (!isAdmin && !isCreator) {
+                throw new ForbiddenException("Beklemeye alma/cikarma islemini sadece ADMIN veya ticket'i olusturan kullanici yapabilir");
+            }
+        } else if (!isAdmin) {
+            throw new ForbiddenException("Ticket'i isleme alma ve tamamlama sadece ADMIN yetkisindedir");
+        }
+
+        // Is kurali #4: gecerli status gecis kontrolu.
+        // Beklemedeki ticket dogrudan isleme sokulamaz (HOLD -> IN_PROGRESS yasak);
+        // once beklemeden alinir (OPEN'a doner), admin yeniden isleme alir.
         if (!current.canTransitionTo(target)) {
             throw new BadRequestException(
                     "Gecersiz status gecisi: " + current + " -> " + target
-                            + " (izin verilen gecisler: OPEN -> IN_PROGRESS/HOLD, IN_PROGRESS -> DONE/HOLD, HOLD -> IN_PROGRESS/OPEN)");
+                            + " (izin verilen gecisler: OPEN -> IN_PROGRESS/HOLD, IN_PROGRESS -> DONE/HOLD, HOLD -> OPEN)");
         }
 
         // HOLD kurali: beklemeye alinirken neden zorunludur ve ticket uzerinde gosterilir;
