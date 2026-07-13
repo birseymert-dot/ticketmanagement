@@ -32,6 +32,10 @@ public class AuthServiceImpl implements AuthService {
      */
     private static final Pattern EMAIL_FORMAT = Pattern.compile(
             "^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.[A-Za-z]{2,}$");
+    private static final Pattern PROFILE_IMAGE_FORMAT = Pattern.compile(
+            "^data:image/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=\\r\\n]+$",
+            Pattern.CASE_INSENSITIVE);
+    private static final int MAX_PROFILE_IMAGE_LENGTH = 300_000;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -58,6 +62,9 @@ public class AuthServiceImpl implements AuthService {
         String email = canonical(request.getEmail());
 
         validateEmailFormat(email);
+        if (request.getDepartment() == null) {
+            throw new BadRequestException("Departman secimi zorunludur");
+        }
 
         // Benzersizlik kontrolleri buyuk/kucuk harf duyarsizdir:
         // "Cansu" kayitliyken "cansu" ile ikinci hesap acilamaz.
@@ -72,13 +79,16 @@ public class AuthServiceImpl implements AuthService {
                 username,
                 email,
                 passwordEncoder.encode(request.getPassword()),
-                Role.USER
+                Role.USER,
+                request.getDepartment()
         );
+        user.setProfileImage(normalizeProfileImage(request.getProfileImage()));
         // En kucuk bos ID atanir; silinen kullanicilarin numaralari yeniden kullanilir
         user.setId(nextFreeUserId());
         userRepository.save(user);
 
-        return new RegisterResponse("Kayit olusturuldu. Giris yapabilirsiniz.", user.getUsername(), user.getRole());
+        return new RegisterResponse("Kayit olusturuldu. Giris yapabilirsiniz.",
+                user.getUsername(), user.getRole(), user.getDepartment(), user.getProfileImage());
     }
 
     @Override
@@ -93,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
         auditLogService.log(AuditAction.LOGIN, user.getUsername(), null, "Kullanici giris yapti");
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-        return new AuthResponse(token, user.getUsername(), user.getRole());
+        return new AuthResponse(token, user.getUsername(), user.getRole(), user.getDepartment(), user.getProfileImage());
     }
 
     private String normalize(String value) {
@@ -125,5 +135,17 @@ public class AuthServiceImpl implements AuthService {
         if (email == null || !EMAIL_FORMAT.matcher(email).matches()) {
             throw new BadRequestException("Email adresi hatali");
         }
+    }
+
+    private String normalizeProfileImage(String profileImage) {
+        if (profileImage == null || profileImage.trim().isEmpty()) {
+            return null;
+        }
+
+        String value = profileImage.trim();
+        if (value.length() > MAX_PROFILE_IMAGE_LENGTH || !PROFILE_IMAGE_FORMAT.matcher(value).matches()) {
+            throw new BadRequestException("Profil fotografi formati hatali");
+        }
+        return value;
     }
 }

@@ -1,6 +1,6 @@
 package com.ticketmanagement.controller;
 
-import com.ticketmanagement.model.entity.AuditLog;
+import com.ticketmanagement.dto.response.AuditLogResponse;
 import com.ticketmanagement.service.AuditLogService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +23,7 @@ public class AuditLogController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AuditLog>> getAllLogs() {
+    public ResponseEntity<List<AuditLogResponse>> getAllLogs() {
         return ResponseEntity.ok(auditLogService.getAllLogs());
     }
 }

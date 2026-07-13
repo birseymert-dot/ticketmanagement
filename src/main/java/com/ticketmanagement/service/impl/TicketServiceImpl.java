@@ -11,6 +11,7 @@ import com.ticketmanagement.exception.NotFoundException;
 import com.ticketmanagement.model.entity.Ticket;
 import com.ticketmanagement.model.entity.User;
 import com.ticketmanagement.model.enums.AuditAction;
+import com.ticketmanagement.model.enums.Department;
 import com.ticketmanagement.model.enums.Role;
 import com.ticketmanagement.model.enums.TicketPriority;
 import com.ticketmanagement.model.enums.TicketStatus;
@@ -89,14 +90,15 @@ public class TicketServiceImpl implements TicketService {
 
         // Bos arama metni filtre uygulanmamis sayilir
         String search = (searchName == null || searchName.trim().isEmpty()) ? null : searchName.trim();
+        Department searchDepartment = Department.fromSearchText(search);
 
         Page<Ticket> page;
         if (user.getRole() == Role.ADMIN) {
             // ADMIN tum ticket'lari gorebilir
-            page = ticketRepository.findAllWithFilters(status, priority, assignedToId, search, pageable);
+            page = ticketRepository.findAllWithFilters(status, priority, assignedToId, search, searchDepartment, pageable);
         } else {
             // USER sadece kendi olusturdugu veya kendisine atanan ticket'lari gorur
-            page = ticketRepository.findOwnWithFilters(user.getId(), status, priority, assignedToId, search, pageable);
+            page = ticketRepository.findOwnWithFilters(user.getId(), status, priority, assignedToId, search, searchDepartment, pageable);
         }
         return PageResponse.from(page, TicketResponse::from);
     }

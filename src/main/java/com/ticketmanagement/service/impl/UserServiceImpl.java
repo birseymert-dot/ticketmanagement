@@ -13,6 +13,7 @@ import com.ticketmanagement.repository.TicketRepository;
 import com.ticketmanagement.repository.UserRepository;
 import com.ticketmanagement.service.AuditLogService;
 import com.ticketmanagement.service.UserService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +37,11 @@ public class UserServiceImpl implements UserService {
         this.auditLogService = auditLogService;
     }
 
-    /** ADMIN icin detayli kullanici listesi: ticket ve yorum istatistikleriyle. */
+    /** ADMIN icin detayli kullanici listesi: departman, ticket ve yorum istatistikleriyle. */
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
-        return userRepository.findAll().stream()
+        return userRepository.findAll(Sort.by(Sort.Direction.ASC, "username")).stream()
                 .map(user -> UserResponse.detailed(
                         user,
                         ticketRepository.countByCreatedById(user.getId()),
@@ -49,10 +50,19 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    /** Ticket atama akisi icin hafif kullanici listesi. */
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAssignableUsers() {
+        return userRepository.findAll(Sort.by(Sort.Direction.ASC, "username")).stream()
+                .map(UserResponse::from)
+                .toList();
+    }
+
     /**
      * Kullanici silme (sadece ADMIN):
      * - ADMIN olmayan istekler reddedilir (403).
-     * - Admin kendi hesabini silemez (400) — sistem yoneticisiz kalmasin.
+     * - Admin kendi hesabini silemez (400) - sistem yoneticisiz kalmasin.
      * - Silinen kullanicinin verileri temizlenir: actigi ticket'lar
      *   (yorumlariyla birlikte) silinir, baskalarinin ticket'larina yazdigi
      *   yorumlar silinir, kendisine atanmis ticket'lar atamasiz birakilir.

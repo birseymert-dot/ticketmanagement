@@ -1,7 +1,9 @@
 package com.ticketmanagement.dto.request;
 
+import com.ticketmanagement.model.enums.Department;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -27,6 +29,12 @@ public class RegisterRequest {
     )
     private String password;
 
+    @NotNull(message = "Departman secimi zorunludur")
+    private Department department;
+
+    @Size(max = 300000, message = "Profil fotografi cok buyuk")
+    private String profileImage;
+
     public String getUsername() {
         return username;
     }
@@ -50,5 +58,20 @@ public class RegisterRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-}
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage != null ? profileImage.trim() : null;
+    }
+}

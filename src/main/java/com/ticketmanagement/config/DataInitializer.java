@@ -1,8 +1,13 @@
 package com.ticketmanagement.config;
 
-import com.ticketmanagement.model.entity.User;
-import com.ticketmanagement.model.enums.Role;
-import com.ticketmanagement.repository.UserRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,13 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.ticketmanagement.model.entity.User;
+import com.ticketmanagement.model.enums.Role;
+import com.ticketmanagement.repository.UserRepository;
 
 /**
  * Uygulama ayaga kalkarken varsayilan bir ADMIN kullanicisi olusturur.
@@ -121,6 +122,13 @@ public class DataInitializer {
         // HOLD gibi sonradan eklenen degerler yazilamaz. VARCHAR'a cevrilir.
         try {
             jdbcTemplate.execute("ALTER TABLE TICKETS ALTER COLUMN STATUS VARCHAR(30) NOT NULL");
+        } catch (Exception e) {
+            // sessizce gecilir
+        }
+        // USERS.DEPARTMENT icin ayni onlem: ileride yeni departman eklenirse
+        // eski veritabanlarinda ENUM kisiti hataya yol acmasin.
+        try {
+            jdbcTemplate.execute("ALTER TABLE USERS ALTER COLUMN DEPARTMENT VARCHAR(30)");
         } catch (Exception e) {
             // sessizce gecilir
         }

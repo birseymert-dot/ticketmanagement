@@ -23,7 +23,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    /** Sadece ADMIN kullanicilari listeleyebilir. */
+    /** Ticket atama listesi: login olan herkes gorebilir; admin ve departman bazli filtre arayuzde yapilir. */
+    @GetMapping("/assignable")
+    public ResponseEntity<List<UserResponse>> getAssignableUsers() {
+        return ResponseEntity.ok(userService.getAssignableUsers());
+    }
+
+    /** Sadece ADMIN kullanicilari detayli listeleyebilir. */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {

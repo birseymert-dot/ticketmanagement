@@ -8,5 +8,7 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
+    List<UserResponse> getAssignableUsers();
+
     void deleteUser(Long id, String requesterUsername);
 }

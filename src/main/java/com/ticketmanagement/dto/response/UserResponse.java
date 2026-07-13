@@ -1,6 +1,7 @@
 package com.ticketmanagement.dto.response;
 
 import com.ticketmanagement.model.entity.User;
+import com.ticketmanagement.model.enums.Department;
 import com.ticketmanagement.model.enums.Role;
 
 public class UserResponse {
@@ -9,6 +10,8 @@ public class UserResponse {
     private String username;
     private String email;
     private Role role;
+    private Department department;
+    private String profileImage;
     private long createdTicketCount;
     private long assignedTicketCount;
     private long commentCount;
@@ -19,6 +22,8 @@ public class UserResponse {
         response.username = user.getUsername();
         response.email = user.getEmail();
         response.role = user.getRole();
+        response.department = user.getDepartment();
+        response.profileImage = user.getProfileImage();
         return response;
     }
 
@@ -47,6 +52,14 @@ public class UserResponse {
 
     public Role getRole() {
         return role;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
     }
 
     public long getCreatedTicketCount() {

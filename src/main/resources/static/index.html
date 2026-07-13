@@ -25,7 +25,7 @@
   body {
     font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
     background: var(--bg); color: var(--ink); min-height: 100vh;
-    font-size: 14px; line-height: 1.5;
+    font-size: 15px; line-height: 1.55;
     -webkit-font-smoothing: antialiased;
   }
   .hidden { display: none !important; }
@@ -36,10 +36,10 @@
     width: 32px; height: 32px; border-radius: 6px; flex: none;
     background: var(--accent); color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 15px; letter-spacing: .5px;
+    font-weight: 700; font-size: 16px; letter-spacing: .5px;
   }
-  .brand-name { font-weight: 600; font-size: 15px; letter-spacing: -.01em; }
-  .brand-sub { font-size: 11px; color: var(--muted); margin-top: -2px; }
+  .brand-name { font-weight: 600; font-size: 16px; letter-spacing: -.01em; }
+  .brand-sub { font-size: 12px; color: var(--muted); margin-top: -2px; }
 
   /* ---------- Giris ekrani ---------- */
   #authView { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
@@ -49,19 +49,19 @@
     padding: 40px; width: 100%; max-width: 400px;
   }
   .auth-card .brand { margin-bottom: 8px; }
-  .auth-card > p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .auth-card > p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
   .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
   .tabs button {
     flex: 1; padding: 10px 0; border: none; background: none; cursor: pointer;
-    font-size: 13px; font-weight: 600; color: var(--muted);
+    font-size: 14px; font-weight: 600; color: var(--muted);
     border-bottom: 2px solid transparent; margin-bottom: -1px;
   }
   .tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin: 14px 0 5px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin: 14px 0 5px; }
   input, select, textarea {
     width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: var(--radius);
-    font-size: 14px; font-family: inherit; background: var(--surface); color: var(--ink);
+    font-size: 15px; font-family: inherit; background: var(--surface); color: var(--ink);
     transition: border-color .12s, box-shadow .12s;
   }
   textarea { resize: vertical; min-height: 80px; }
@@ -74,7 +74,7 @@
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     padding: 9px 16px; border: 1px solid transparent; border-radius: var(--radius);
-    font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
+    font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
     background: var(--accent); color: #fff; transition: background .12s, border-color .12s;
   }
   .btn:hover { background: var(--accent-hover); }
@@ -83,43 +83,64 @@
   .btn.secondary:hover { background: #f8fafc; border-color: var(--faint); }
   .btn.danger { background: var(--surface); color: var(--danger); border-color: #fca5a5; }
   .btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
-  .btn.small { padding: 6px 12px; font-size: 12px; }
+  .btn.small { padding: 7px 13px; font-size: 13px; }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
 
   .auth-note {
     margin-top: 16px; padding: 10px 12px; border-radius: var(--radius);
     background: #f8fafc; border: 1px solid var(--border);
-    font-size: 12px; color: var(--muted);
+    font-size: 13px; color: var(--muted);
   }
   .auth-note b { color: #334155; }
+
+  .profile-upload {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: #f8fafc;
+  }
+  .profile-upload-actions { flex: 1; min-width: 0; }
+  .profile-upload-actions .btn { margin-right: 6px; margin-bottom: 6px; }
+  .upload-help { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe;
+    font-size: 13px; font-weight: 700; text-transform: uppercase; overflow: hidden;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .avatar-sm { width: 36px; height: 36px; font-size: 13px; }
+  .avatar-md { width: 42px; height: 42px; font-size: 14px; }
+  .avatar-lg { width: 76px; height: 76px; font-size: 22px; }
+  .person-line { display: inline-flex; align-items: center; gap: 10px; vertical-align: middle; min-width: 0; line-height: 1.2; }
 
   /* ---------- Uygulama cercevesi ---------- */
   header {
     background: var(--surface); border-bottom: 1px solid var(--border);
     padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 10; min-height: 58px;
+    flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 10; min-height: 66px;
   }
   nav { display: flex; gap: 2px; align-self: stretch; align-items: stretch; }
   nav button {
     padding: 0 16px; border: none; background: none; cursor: pointer;
-    font-size: 13px; font-weight: 600; font-family: inherit; color: var(--muted);
+    font-size: 14px; font-weight: 600; font-family: inherit; color: var(--muted);
     border-bottom: 2px solid transparent;
   }
   nav button:hover { color: var(--ink); }
   nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
   .header-right { display: flex; align-items: center; gap: 16px; }
   .who { text-align: right; line-height: 1.3; }
-  .who .who-name { font-size: 13px; font-weight: 600; }
-  .who .who-role { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+  .who .who-name { font-size: 15px; font-weight: 600; }
+  .who .who-role { font-size: 13px; color: var(--muted); letter-spacing: .02em; }
   .logout-btn {
     padding: 7px 14px; border: 1px solid #cbd5e1; border-radius: var(--radius);
-    background: var(--surface); color: #334155; font-size: 12px; font-weight: 600;
+    background: var(--surface); color: #334155; font-size: 13px; font-weight: 600;
     font-family: inherit; cursor: pointer;
   }
   .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
-  main { max-width: 1080px; margin: 0 auto; padding: 28px 24px 72px; }
-  .page-title { font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+  main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 72px; }
+  .page-title { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
   .page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
 
   .card {
@@ -127,7 +148,7 @@
     border-radius: 8px; box-shadow: var(--shadow); padding: 22px;
   }
   .card + .card { margin-top: 16px; }
-  .card h2 { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 14px; }
+  .card h2 { font-size: 15px; font-weight: 600; color: #334155; margin-bottom: 14px; }
 
   /* ---------- Dashboard ---------- */
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 16px; }
@@ -135,8 +156,8 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
     box-shadow: var(--shadow); padding: 18px 20px;
   }
-  .stat .lbl { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .stat .num { font-size: 26px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .stat .num { font-size: 28px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
 
   /* ---------- Ticket listesi ---------- */
   .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
@@ -145,23 +166,31 @@
 
   .ticket {
     border: 1px solid var(--border); border-radius: 8px;
-    padding: 16px 18px; background: var(--surface);
+    padding: 18px 20px; background: var(--surface);
   }
   .ticket + .ticket { margin-top: 10px; }
-  .ticket .creator { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .ticket .creator { margin-bottom: 10px; }
   .ticket .creator b { color: #334155; font-weight: 600; }
+  .user-main { font-size: 14px; font-weight: 600; color: #334155; }
+  .user-sub { display: inline; font-size: 12.5px; color: var(--muted); }
+  .meta-person { display: inline-flex; align-items: center; vertical-align: middle; gap: 4px; white-space: nowrap; line-height: 1.2; }
+  .meta-person .user-sub::before { content: "·"; color: var(--faint); margin-right: 4px; }
+  .meta-item { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; vertical-align: middle; }
+  .meta-label { color: var(--muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .meta-date { display: inline-flex; align-items: center; min-height: 36px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .meta-date::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--faint); margin-right: 12px; }
   .ticket .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-  .ticket h3 { font-size: 14.5px; font-weight: 600; letter-spacing: -.01em; }
+  .ticket h3 { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
   .ticket .ticket-no { color: var(--faint); font-weight: 500; margin-right: 6px; }
-  .ticket .desc { color: var(--muted); font-size: 13px; margin: 6px 0 10px; max-width: 72ch; }
-  .ticket .meta { font-size: 12px; color: var(--muted); padding-top: 10px; border-top: 1px solid #f1f5f9; }
+  .ticket .desc { color: var(--muted); font-size: 14.5px; margin: 7px 0 12px; max-width: 72ch; }
+  .ticket .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); padding-top: 12px; border-top: 1px solid #f1f5f9; }
   .ticket .meta b { color: #334155; font-weight: 600; }
   .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 
   .badges { display: flex; gap: 6px; flex-wrap: wrap; }
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 11px; font-weight: 600; letter-spacing: .02em;
+    font-size: 12px; font-weight: 600; letter-spacing: .02em;
     padding: 3px 10px; border-radius: 20px; border: 1px solid transparent;
   }
   .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
@@ -174,7 +203,7 @@
   .hold-note {
     margin: 8px 0 2px; padding: 9px 12px; border-radius: var(--radius);
     background: #f5f3ff; border: 1px solid #ede9fe; border-left: 3px solid #7c3aed;
-    font-size: 12.5px; color: #4c1d95;
+    font-size: 13.5px; color: #4c1d95;
   }
   .hold-note b { font-weight: 600; }
   .b-LOW         { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
@@ -182,34 +211,106 @@
   .b-HIGH        { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
   .r-ADMIN       { background: #eef2ff; color: #3730a3; border-color: #e0e7ff; }
   .r-USER        { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+  .ticket-tag {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    min-width: 76px; padding: 4px 10px; border-radius: 999px;
+    background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe;
+    font-size: 12px; font-weight: 700; white-space: nowrap;
+  }
+  .ticket-tag::before { content: "#"; color: #60a5fa; font-weight: 800; }
+
+  /* Islem kayitlari: filtreler ayni hizada, tek satir etiketli */
+  .audit-filters { align-items: flex-end; gap: 14px; margin-bottom: 20px; }
+  .audit-filters label { white-space: nowrap; }
+  .audit-filters .audit-search { flex: 0 1 380px; min-width: 260px; max-width: 380px; }
+  .audit-filters .audit-type { flex: 0 0 200px; min-width: 200px; max-width: 200px; }
+
+  /* Islem kayitlari tablosu: sutunlar sabit hizada, cizgiler duz durur.
+     Kullanici -> Ticket ve Ticket -> Detay arasinda genis nefes payi birakilir. */
+  .audit-table { table-layout: fixed; min-width: 920px; }
+  .audit-table th, .audit-table td { padding: 13px 14px; }
+  .audit-table th:nth-child(1), .audit-table td:nth-child(1) { width: 140px; }
+  .audit-table th:nth-child(2), .audit-table td:nth-child(2) { width: 160px; }
+  .audit-table th:nth-child(3), .audit-table td:nth-child(3) { width: 220px; }
+  .audit-table th:nth-child(4), .audit-table td:nth-child(4) { width: 150px; padding-left: 44px; text-align: center; }
+  .audit-table th:nth-child(5), .audit-table td:nth-child(5) { padding-left: 44px; }
+  .audit-table td:nth-child(5) { overflow-wrap: break-word; line-height: 1.5; color: #334155; }
+  .audit-table td { height: 60px; }
+  .audit-table td:nth-child(1) { color: var(--muted); font-variant-numeric: tabular-nums; }
 
   .pager { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 18px; }
-  .pager span { font-size: 12px; color: var(--muted); }
+  .pager span { font-size: 13px; color: var(--muted); }
 
-  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+  .empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
 
   /* ---------- Yorumlar ---------- */
   .comments { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
-  .comments-title { font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 8px; }
-  .comment { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: var(--radius); padding: 9px 12px; margin-bottom: 6px; font-size: 13px; }
-  .comment b { font-size: 12px; color: #334155; }
-  .comment .when { color: var(--faint); font-size: 11px; margin-left: 6px; }
+  .comments-title { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 10px; }
+  .comments-count { color: var(--muted); font-weight: 600; margin-left: 2px; }
+  .comments-list { max-height: 280px; overflow-y: auto; padding-right: 4px; }
+  .comment { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: var(--radius); padding: 10px 13px; margin-bottom: 7px; font-size: 14px; }
+  .comment b { font-size: 13px; color: #334155; }
+  .comment-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 7px; }
+  .comment .when { color: var(--faint); font-size: 12px; }
+  .comment-body { color: #334155; line-height: 1.45; }
   .comment-form { display: flex; gap: 8px; margin-top: 10px; }
   .comment-form input { flex: 1; }
 
   /* ---------- Tablolar ---------- */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  th { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; background: #f8fafc; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  td .person-line { min-height: 38px; }
+  th { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; background: #f8fafc; }
   tbody tr:hover, tr:not(:first-child):hover { background: #fafbfc; }
   td b { font-weight: 600; }
   .table-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+  .users-card { padding: 24px; }
+  .user-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 14px; }
+  .user-card {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .user-card:hover { background: #fbfcfe; border-color: #cbd5e1; }
+  .user-card-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .user-identity { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .user-identity .person-line { min-height: 44px; gap: 12px; }
+  .user-identity .avatar-sm { width: 44px; height: 44px; font-size: 15px; }
+  .user-identity .user-main { font-size: 15px; }
+  .user-identity .user-sub { font-size: 13px; }
+  .user-id { color: var(--faint); font-size: 12px; font-weight: 600; margin-left: 56px; }
+  .user-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .user-field {
+    min-width: 0;
+    padding: 10px 11px;
+    border: 1px solid #eef2f7;
+    border-radius: 7px;
+    background: #f8fafc;
+  }
+  .user-field-wide { grid-column: 1 / -1; }
+  .user-field-label {
+    display: block; color: var(--muted); font-size: 11px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase; margin-bottom: 3px;
+  }
+  .user-field-value { display: block; color: #334155; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; line-height: 1.35; }
+  .user-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .user-stat .user-field-value { font-size: 18px; font-variant-numeric: tabular-nums; }
+  .user-action { display: flex; justify-content: flex-end; flex: none; }
+  @media (max-width: 640px) {
+    .user-board { grid-template-columns: 1fr; }
+    .user-card-head { align-items: flex-start; flex-direction: column; }
+    .user-details, .user-stats { grid-template-columns: 1fr; }
+    .user-id { margin-left: 0; }
+    .user-action { justify-content: flex-start; }
+  }
 
   /* ---------- Bildirim ---------- */
   #toast {
     position: fixed; bottom: 24px; right: 24px;
     background: #1e293b; color: #f1f5f9; padding: 11px 18px;
-    border-radius: var(--radius); font-size: 13px;
+    border-radius: var(--radius); font-size: 14px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .18); z-index: 60; max-width: min(420px, 90vw);
   }
   #toast.err { background: #7f1d1d; }
@@ -225,10 +326,18 @@
     width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
   }
-  .modal h2 { font-size: 16px; font-weight: 600; }
-  .modal .modal-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .modal h2 { font-size: 18px; font-weight: 600; }
+  .modal .modal-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
   .modal-actions .btn { flex: 1; }
+  .crop-modal { max-width: 420px; }
+  .crop-area {
+    width: 280px; height: 280px; margin: 18px auto 14px;
+    border-radius: 50%; overflow: hidden; border: 1px solid var(--border);
+    background: #f8fafc; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+  #cropCanvas { width: 280px; height: 280px; display: block; cursor: move; touch-action: none; }
+  input[type="range"] { accent-color: var(--accent); }
 
   @media (max-width: 640px) {
     header { padding: 10px 16px; }
@@ -238,6 +347,8 @@
     .filters > div { max-width: none; min-width: 100%; }
     .ticket .top { flex-direction: column; gap: 8px; }
     .auth-card { padding: 28px 22px; }
+    .profile-upload { align-items: flex-start; }
+    .crop-area, #cropCanvas { width: 240px; height: 240px; }
   }
 </style>
 </head>
@@ -268,9 +379,27 @@
     </form>
     <form id="registerForm" class="hidden" onsubmit="doRegister(event)">
       <label>Kullanıcı adı</label>
-      <input id="regUsername" required minlength="3">
+      <input id="regUsername" required minlength="3" oninput="updateRegisterAvatarPreview()">
       <label>E-posta</label>
       <input id="regEmail" type="email" required>
+      <label>Departman</label>
+      <select id="regDepartment" required>
+        <option value="">Departman seçin</option>
+        <option value="IT">IT Departmanı</option>
+        <option value="ANDROID">Android Departmanı</option>
+        <option value="IOS">iOS Departmanı</option>
+        <option value="IKA">IKA Departmanı</option>
+      </select>
+      <label>Profil fotoğrafı (opsiyonel)</label>
+      <div class="profile-upload">
+        <div id="regAvatarPreview" class="avatar avatar-lg">?</div>
+        <div class="profile-upload-actions">
+          <button class="btn small secondary" type="button" onclick="$('profileFile').click()">Fotoğraf yükle</button>
+          <button class="btn small secondary" type="button" onclick="removeProfileImage()">Kaldır</button>
+          <div class="upload-help">Fotoğrafı yükledikten sonra konumlandırıp onaylayabilirsiniz.</div>
+          <input id="profileFile" class="hidden" type="file" accept="image/png,image/jpeg,image/webp" onchange="openProfileCrop(event)">
+        </div>
+      </div>
       <label>Şifre (en az 6 karakter, en az 3 harf)</label>
       <input id="regPassword" type="password" required minlength="6" pattern="^(?=(?:.*[A-Za-zÇĞİÖŞÜçğıöşü]){3,}).*$" title="Şifre en az 6 karakter olmalı ve en az 3 harf içermelidir.">
       <button class="btn full" type="submit">Hesap Oluştur</button>
@@ -294,6 +423,7 @@
       <button id="navAudit" class="hidden" onclick="showPage('audit')">İşlem Kayıtları</button>
     </nav>
     <div class="header-right">
+      <div id="whoAvatar" class="avatar avatar-md">?</div>
       <div class="who">
         <div class="who-name" id="whoName"></div>
         <div class="who-role" id="whoRole"></div>
@@ -333,8 +463,8 @@
               <option value="">Tümü</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option>
             </select></div>
           <!-- Sadece ADMIN gorur: USER zaten yalnizca kendi ticket'larini listeler -->
-          <div id="fSearchWrap"><label>Kullanıcı ara (oluşturan / atanan)</label>
-            <input id="fSearchUser" type="text" placeholder="örn. yagmur" oninput="onTicketSearchInput()"></div>
+          <div id="fSearchWrap"><label>Kullanıcı veya departman ara</label>
+            <input id="fSearchUser" type="text" placeholder="örn. yagmur, it, android" oninput="onTicketSearchInput()"></div>
         </div>
         <div id="ticketList"></div>
         <div class="pager">
@@ -348,8 +478,8 @@
     <!-- Kullanicilar (admin) -->
     <section id="pageUsers" class="hidden">
       <div class="page-head"><div class="page-title">Kullanıcılar</div></div>
-      <div class="card">
-        <div class="table-wrap"><table id="userTable"></table></div>
+      <div class="card users-card">
+        <div id="userBoard" class="user-board"></div>
       </div>
     </section>
 
@@ -357,12 +487,24 @@
     <section id="pageAudit" class="hidden">
       <div class="page-head"><div class="page-title">İşlem Kayıtları</div></div>
       <div class="card">
-        <div class="filters">
-          <div><label>Kayıtlarda ara (kullanıcı, işlem, detay)</label>
-            <input id="auditSearch" type="text" placeholder="örn. yagmur veya silindi" oninput="renderAudit()"></div>
+        <div class="filters audit-filters">
+          <div class="audit-search"><label>Kayıtlarda Ara</label>
+            <input id="auditSearch" type="text" placeholder="Kullanıcı, birim, işlem veya detay yazın..." oninput="onAuditSearchInput()"></div>
+          <div class="audit-type"><label>İşlem Türü</label>
+            <select id="auditType" onchange="onAuditSearchInput()">
+              <option value="">Tüm işlemler</option>
+              <option value="TICKET">Ticket işlemleri</option>
+              <option value="LOGIN">Oturum açma</option>
+              <option value="USER_DELETED">Kullanıcı işlemleri</option>
+            </select></div>
         </div>
-        <div class="table-wrap"><table id="auditTable"></table></div>
+        <div class="table-wrap"><table id="auditTable" class="audit-table"></table></div>
         <p class="empty" id="auditCount" style="margin-top:8px"></p>
+        <div class="pager" id="auditPager">
+          <button class="btn small secondary" id="auditPrevBtn" onclick="changeAuditPage(-1)">Önceki</button>
+          <span id="auditPageInfo">Sayfa 1 / 1</span>
+          <button class="btn small secondary" id="auditNextBtn" onclick="changeAuditPage(1)">Sonraki</button>
+        </div>
       </div>
     </section>
   </main>
@@ -380,9 +522,19 @@
       <textarea id="tDesc" required maxlength="2000"></textarea>
       <label>Öncelik</label>
       <select id="tPriority"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option></select>
-      <label>Atanacak kullanıcı adı (opsiyonel)</label>
-      <input id="tAssigned" type="text" list="userOptions" placeholder="örn. admin">
-      <datalist id="userOptions"></datalist>
+      <label>Atama grubu (opsiyonel)</label>
+      <select id="tAssignGroup" onchange="renderAssigneeOptions()">
+        <option value="">Atama yok</option>
+        <option value="ADMIN">Admin</option>
+        <option value="IT">IT Departmanı</option>
+        <option value="ANDROID">Android Departmanı</option>
+        <option value="IOS">iOS Departmanı</option>
+        <option value="IKA">IKA Departmanı</option>
+      </select>
+      <label>Atanacak kişi</label>
+      <select id="tAssigned" disabled>
+        <option value="">Önce grup seçin</option>
+      </select>
       <div class="modal-actions">
         <button class="btn" type="submit">Kaydet</button>
         <button class="btn secondary" type="button" onclick="closeTicketModal()">Vazgeç</button>
@@ -407,9 +559,29 @@
   </div>
 </div>
 
+<!-- Profil fotografi kirpma modali -->
+<div id="profileCropModal" class="modal-bg hidden" onclick="if(event.target===this)closeProfileCropModal()">
+  <div class="modal crop-modal">
+    <h2>Profil Fotoğrafı</h2>
+    <div class="modal-sub">Fotoğrafı sürükleyerek konumlandırın, yakınlaştırma ayarını yapıp onaylayın.</div>
+    <div class="crop-area">
+      <canvas id="cropCanvas" width="280" height="280"
+              onmousedown="startCropDrag(event)" onmousemove="moveCropDrag(event)" onmouseup="endCropDrag()" onmouseleave="endCropDrag()"
+              ontouchstart="startCropDrag(event)" ontouchmove="moveCropDrag(event)" ontouchend="endCropDrag()"></canvas>
+    </div>
+    <label>Yakınlaştır</label>
+    <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" oninput="setCropZoom(this.value)">
+    <div class="modal-actions">
+      <button class="btn" type="button" onclick="confirmProfileCrop()">Onayla</button>
+      <button class="btn secondary" type="button" onclick="closeProfileCropModal()">Vazgeç</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = '/api';
-const state = { token: null, username: null, role: null, page: 0, totalPages: 0, editingId: null, openComments: new Set(), ticketsById: {} };
+const state = { token: null, username: null, role: null, department: null, profileImage: null, pendingProfileImage: null, page: 0, totalPages: 0, auditPage: 0, auditPageSize: 10, editingId: null, holdTicketId: null, openComments: new Set(), ticketsById: {}, assignableUsers: [] };
+const cropState = { image: null, x: 0, y: 0, scale: 1, minScale: 1, dragging: false, lastX: 0, lastY: 0 };
 
 /* ---------- yardimcilar ---------- */
 function $(id) { return document.getElementById(id); }
@@ -446,12 +618,174 @@ function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+function initials(name) {
+  const value = String(name || '').trim();
+  return value ? value.charAt(0).toLocaleUpperCase('tr-TR') : '?';
+}
+
+function avatarHtml(username, profileImage, size) {
+  const cls = size || 'avatar-sm';
+  const title = esc(username || 'Kullanıcı');
+  if (profileImage) {
+    return `<span class="avatar ${cls}" title="${title}"><img src="${esc(profileImage)}" alt="${title}"></span>`;
+  }
+  return `<span class="avatar ${cls}" title="${title}">${esc(initials(username))}</span>`;
+}
+
+function setAvatar(el, username, profileImage, size) {
+  if (!el) return;
+  el.className = 'avatar ' + (size || 'avatar-sm');
+  el.title = username || 'Kullanıcı';
+  if (profileImage) {
+    el.innerHTML = `<img src="${esc(profileImage)}" alt="${esc(username || 'Kullanıcı')}">`;
+  } else {
+    el.textContent = initials(username);
+  }
+}
+
+function updateRegisterAvatarPreview() {
+  const preview = $('regAvatarPreview');
+  if (!preview) return;
+  const name = $('regUsername') ? $('regUsername').value : '';
+  setAvatar(preview, name, state.pendingProfileImage, 'avatar-lg');
+}
+
 /* ---------- auth ---------- */
 function switchAuthTab(tab) {
   $('tabLogin').classList.toggle('active', tab === 'login');
   $('tabRegister').classList.toggle('active', tab === 'register');
   $('loginForm').classList.toggle('hidden', tab !== 'login');
   $('registerForm').classList.toggle('hidden', tab !== 'register');
+}
+
+function openProfileCrop(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    toast('Lütfen geçerli bir fotoğraf seçin.', 'err');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Fotoğraf 5 MB altında olmalıdır.', 'err');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => loadCropImage(reader.result);
+  reader.readAsDataURL(file);
+}
+
+function loadCropImage(src) {
+  const image = new Image();
+  image.onload = () => {
+    const canvas = $('cropCanvas');
+    cropState.image = image;
+    cropState.minScale = Math.max(canvas.width / image.width, canvas.height / image.height);
+    cropState.scale = cropState.minScale;
+    cropState.x = (canvas.width - image.width * cropState.scale) / 2;
+    cropState.y = (canvas.height - image.height * cropState.scale) / 2;
+    $('cropZoom').min = cropState.minScale.toFixed(2);
+    $('cropZoom').max = (cropState.minScale * 3).toFixed(2);
+    $('cropZoom').value = cropState.scale.toFixed(2);
+    $('profileCropModal').classList.remove('hidden');
+    drawCrop();
+  };
+  image.onerror = () => toast('Fotoğraf okunamadı.', 'err');
+  image.src = src;
+}
+
+function drawCrop() {
+  const canvas = $('cropCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (!cropState.image) return;
+  clampCrop();
+  ctx.drawImage(
+    cropState.image,
+    cropState.x,
+    cropState.y,
+    cropState.image.width * cropState.scale,
+    cropState.image.height * cropState.scale
+  );
+}
+
+function clampCrop() {
+  const canvas = $('cropCanvas');
+  const width = cropState.image.width * cropState.scale;
+  const height = cropState.image.height * cropState.scale;
+  cropState.x = width <= canvas.width ? (canvas.width - width) / 2 : Math.min(0, Math.max(canvas.width - width, cropState.x));
+  cropState.y = height <= canvas.height ? (canvas.height - height) / 2 : Math.min(0, Math.max(canvas.height - height, cropState.y));
+}
+
+function cropPoint(event) {
+  const point = event.touches ? event.touches[0] : event;
+  return { x: point.clientX, y: point.clientY };
+}
+
+function startCropDrag(event) {
+  if (!cropState.image) return;
+  event.preventDefault();
+  const point = cropPoint(event);
+  cropState.dragging = true;
+  cropState.lastX = point.x;
+  cropState.lastY = point.y;
+}
+
+function moveCropDrag(event) {
+  if (!cropState.dragging || !cropState.image) return;
+  event.preventDefault();
+  const point = cropPoint(event);
+  cropState.x += point.x - cropState.lastX;
+  cropState.y += point.y - cropState.lastY;
+  cropState.lastX = point.x;
+  cropState.lastY = point.y;
+  drawCrop();
+}
+
+function endCropDrag() {
+  cropState.dragging = false;
+}
+
+function setCropZoom(value) {
+  if (!cropState.image) return;
+  const canvas = $('cropCanvas');
+  const oldScale = cropState.scale;
+  const nextScale = Number(value);
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const imageCenterX = (centerX - cropState.x) / oldScale;
+  const imageCenterY = (centerY - cropState.y) / oldScale;
+  cropState.scale = nextScale;
+  cropState.x = centerX - imageCenterX * nextScale;
+  cropState.y = centerY - imageCenterY * nextScale;
+  drawCrop();
+}
+
+function confirmProfileCrop() {
+  if (!cropState.image) return;
+  const size = 128;
+  const source = $('cropCanvas');
+  const output = document.createElement('canvas');
+  output.width = size;
+  output.height = size;
+  output.getContext('2d').drawImage(source, 0, 0, size, size);
+  state.pendingProfileImage = output.toDataURL('image/jpeg', 0.86);
+  updateRegisterAvatarPreview();
+  closeProfileCropModal();
+}
+
+function closeProfileCropModal() {
+  $('profileCropModal').classList.add('hidden');
+  cropState.image = null;
+  cropState.dragging = false;
+}
+
+function removeProfileImage() {
+  state.pendingProfileImage = null;
+  updateRegisterAvatarPreview();
 }
 
 async function doLogin(e) {
@@ -465,24 +799,28 @@ async function doLogin(e) {
 async function doRegister(e) {
   e.preventDefault();
   try {
-    const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ username: $('regUsername').value, email: $('regEmail').value, password: $('regPassword').value }) });
+    const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ username: $('regUsername').value, email: $('regEmail').value, department: $('regDepartment').value, profileImage: state.pendingProfileImage, password: $('regPassword').value }) });
     toast(data.message || 'Kayıt oluşturuldu. Giriş yapabilirsiniz.', 'ok');
     $('loginUsername').value = data.username || $('regUsername').value.trim();
     $('loginPassword').value = '';
     $('regUsername').value = '';
     $('regEmail').value = '';
+    $('regDepartment').value = '';
     $('regPassword').value = '';
+    state.pendingProfileImage = null;
+    updateRegisterAvatarPreview();
     switchAuthTab('login');
   } catch (err) { toast(err.message, 'err'); }
 }
 
 function startSession(data) {
-  state.token = data.token; state.username = data.username; state.role = data.role;
-  sessionStorage.setItem('tms', JSON.stringify({ token: data.token, username: data.username, role: data.role }));
+  state.token = data.token; state.username = data.username; state.role = data.role; state.department = data.department || null; state.profileImage = data.profileImage || null;
+  sessionStorage.setItem('tms', JSON.stringify({ token: data.token, username: data.username, role: data.role, department: state.department, profileImage: state.profileImage }));
   $('authView').classList.add('hidden');
   $('appView').classList.remove('hidden');
   $('whoName').textContent = state.username;
-  $('whoRole').textContent = state.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı';
+  $('whoRole').textContent = roleLabel(state.role, state.department);
+  setAvatar($('whoAvatar'), state.username, state.profileImage, 'avatar-md');
   const isAdmin = state.role === 'ADMIN';
   $('navUsers').classList.toggle('hidden', !isAdmin);
   $('navAudit').classList.toggle('hidden', !isAdmin);
@@ -495,7 +833,7 @@ function startSession(data) {
 
 function logout() {
   sessionStorage.removeItem('tms');
-  state.token = state.username = state.role = null;
+  state.token = state.username = state.role = state.department = state.profileImage = null;
   $('appView').classList.add('hidden');
   $('authView').classList.remove('hidden');
 }
@@ -515,6 +853,30 @@ function showPage(name) {
 
 /* ---------- genel bakis ---------- */
 const STATUS_TR = { OPEN: 'Açık', IN_PROGRESS: 'İşlemde', HOLD: 'Beklemede', DONE: 'Tamamlandı' };
+const DEPARTMENT_TR = { IT: 'IT Departmanı', ANDROID: 'Android Departmanı', IOS: 'iOS Departmanı', IKA: 'IKA Departmanı' };
+
+function deptLabel(department) {
+  return department ? (DEPARTMENT_TR[department] || department) : 'Departman yok';
+}
+
+function roleLabel(role, department) {
+  return role === 'ADMIN' ? 'Yönetici' : deptLabel(department);
+}
+
+function userInline(username, role, department, profileImage) {
+  if (!username) return '<b>—</b>';
+  return `<span class="person-line">${avatarHtml(username, profileImage, 'avatar-sm')}<span class="meta-person"><span class="user-main">${esc(username)}</span><span class="user-sub">${roleLabel(role, department)}</span></span></span>`;
+}
+
+function userBlock(label, username, role, department, profileImage) {
+  return `<span class="meta-item"><span class="meta-label">${esc(label)}:</span>${userInline(username, role, department, profileImage)}</span>`;
+}
+
+async function loadAssignableUsers(force) {
+  if (!force && state.assignableUsers && state.assignableUsers.length) return state.assignableUsers;
+  state.assignableUsers = await api('/users/assignable');
+  return state.assignableUsers;
+}
 
 async function loadDashboard() {
   try {
@@ -527,6 +889,8 @@ async function loadDashboard() {
     $('lastTickets').innerHTML = d.lastFiveTickets.length
       ? d.lastFiveTickets.map(t => ticketCard(t, 'd')).join('')
       : '<p class="empty">Henüz ticket bulunmuyor.</p>';
+    // Yorumlar YouTube tarzinda her kartta acik gelir: hepsini otomatik yukle
+    d.lastFiveTickets.forEach(t => loadComments('d', t.id));
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -551,11 +915,6 @@ async function loadTickets() {
     $('pageInfo').textContent = d.totalPages ? `Sayfa ${d.page + 1} / ${d.totalPages} — ${d.totalElements} kayıt` : '';
     $('prevBtn').disabled = d.page <= 0;
     $('nextBtn').disabled = d.page >= d.totalPages - 1;
-    for (const key of [...state.openComments]) {
-      if (!$('cbox-' + key)) { state.openComments.delete(key); continue; }
-      const [ctx, id] = key.split('-');
-      loadComments(ctx, id);
-    }
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -596,30 +955,34 @@ function ticketCard(t, ctx) {
     if (mine) actions += `<button class="btn small secondary" onclick="openTicketModalById(${t.id})">Düzenle</button>`;
     if (isAdmin) actions += `<button class="btn small danger" onclick="deleteTicket(${t.id})">Sil</button>`;
   }
-  // Yorumlar tek yerden yonetilir: SADECE Genel Bakis'ta gosterilir
-  // (Ticket'lar sayfasinda tekrar etmemesi icin). Admin ve user icin ayni kural;
-  // kimin hangi ticket'a yorum yazabilecegini backend belirler.
-  if (compact) actions += `<button class="btn small secondary" onclick="toggleComments('${ctx}',${t.id})">Yorum yap</button>`;
   const key = ctx + '-' + t.id;
+  // Yorumlar SADECE Genel Bakis'ta ve YouTube tarzinda gosterilir:
+  // bolum her zaman aciktir, yorumlar listelenir, en altta yorum yazma kutusu durur.
+  const commentsHtml = compact ? `
+    <div id="cbox-${key}" class="comments">
+      <div class="comments-title">Yorumlar <span class="comments-count" id="ccount-${key}"></span></div>
+      <div id="clist-${key}" class="comments-list"><p class="empty" style="font-size:13px">Yorumlar yükleniyor...</p></div>
+      <form class="comment-form" onsubmit="addComment(event,'${ctx}',${t.id})">
+        <input id="cinput-${key}" placeholder="Yorum yap..." required maxlength="1000">
+        <button class="btn small" type="submit">Gönder</button>
+      </form>
+    </div>` : '';
   return `
   <div class="ticket">
-    <div class="creator">Oluşturan: <b>${esc(t.createdBy)}</b></div>
+    <div class="creator">${userBlock('Oluşturan', t.createdBy, t.createdByRole, t.createdByDepartment, t.createdByProfileImage)}</div>
     <div class="top">
       <h3><span class="ticket-no">#${t.id}</span>${esc(t.title)}</h3>
       <div class="badges"><span class="badge b-${t.status}">${STATUS_TR[t.status] || t.status}</span><span class="badge b-${t.priority}">${t.priority}</span></div>
     </div>
     <div class="desc">${esc(t.description)}</div>
     ${t.status === 'HOLD' && t.holdReason ? `<div class="hold-note"><b>Bekleme nedeni:</b> ${esc(t.holdReason)}</div>` : ''}
-    <div class="meta">Atanan: <b>${esc(t.assignedTo || '—')}</b> &nbsp;·&nbsp; Oluşturma: ${fmtDate(t.createdDate)} &nbsp;·&nbsp; Son güncelleme: ${fmtDate(t.updatedDate)}</div>
-    <div class="actions">${actions}</div>
-    <div id="cbox-${key}" class="comments hidden">
-      <div class="comments-title">Yorumlar</div>
-      <div id="clist-${key}"></div>
-      <form class="comment-form" onsubmit="addComment(event,'${ctx}',${t.id})">
-        <input id="cinput-${key}" placeholder="Yorumunuzu yazın..." required>
-        <button class="btn small" type="submit">Gönder</button>
-      </form>
+    <div class="meta">
+      ${userBlock('Atanan', t.assignedTo, t.assignedToRole, t.assignedToDepartment, t.assignedToProfileImage)}
+      <span class="meta-date">Oluşturma: ${fmtDate(t.createdDate)}</span>
+      <span class="meta-date">Son güncelleme: ${fmtDate(t.updatedDate)}</span>
     </div>
+    <div class="actions">${actions}</div>
+    ${commentsHtml}
   </div>`;
 }
 
@@ -680,27 +1043,49 @@ function openTicketModal(t) {
   $('tTitle').value = t ? t.title : '';
   $('tDesc').value = t ? t.description : '';
   $('tPriority').value = t ? t.priority : 'MEDIUM';
-  $('tAssigned').value = t && t.assignedTo ? t.assignedTo : '';
-  fillUserOptions();
+  const assignGroup = t && t.assignedToRole === 'ADMIN' ? 'ADMIN' : (t && t.assignedToDepartment ? t.assignedToDepartment : '');
+  $('tAssignGroup').value = assignGroup;
+  fillUserOptions(t && t.assignedTo ? t.assignedTo : '');
   $('ticketModal').classList.remove('hidden');
 }
 
 /* Atama kutusu icin kisi onerileri:
    ADMIN tum kullanicilari gorur; USER liste cekemedigi icin
    ekranindaki ticket'larda gecen isimlerden oneri olusturulur. */
-async function fillUserOptions() {
-  let names = new Set([state.username]);
-  if (state.role === 'ADMIN') {
-    try {
-      (await api('/users')).forEach(u => names.add(u.username));
-    } catch (e) { /* oneri dolmasa da form calisir */ }
-  } else if (state.ticketsById) {
-    Object.values(state.ticketsById).forEach(t => {
-      if (t.createdBy) names.add(t.createdBy);
-      if (t.assignedTo) names.add(t.assignedTo);
-    });
+async function fillUserOptions(selectedUsername) {
+  try {
+    await loadAssignableUsers();
+    renderAssigneeOptions(selectedUsername || '');
+  } catch (e) {
+    $('tAssigned').innerHTML = '<option value="">Kullanıcı listesi alınamadı</option>';
+    $('tAssigned').disabled = true;
   }
-  $('userOptions').innerHTML = [...names].map(n => `<option value="${esc(n)}">`).join('');
+}
+
+function renderAssigneeOptions(selectedUsername) {
+  const group = $('tAssignGroup').value;
+  const select = $('tAssigned');
+  if (!group) {
+    select.innerHTML = '<option value="">Atama yok</option>';
+    select.disabled = true;
+    return;
+  }
+
+  const users = (state.assignableUsers || []).filter(u =>
+    group === 'ADMIN' ? u.role === 'ADMIN' : u.role !== 'ADMIN' && u.department === group
+  );
+
+  if (!users.length) {
+    select.innerHTML = '<option value="">Bu grupta kullanıcı yok</option>';
+    select.disabled = true;
+    return;
+  }
+
+  select.disabled = false;
+  select.innerHTML = '<option value="">Kişi seçin</option>' + users.map(u =>
+    `<option value="${esc(u.username)}">${esc(u.username)} — ${roleLabel(u.role, u.department)}</option>`
+  ).join('');
+  if (selectedUsername) select.value = selectedUsername;
 }
 
 function closeTicketModal() { $('ticketModal').classList.add('hidden'); }
@@ -708,7 +1093,7 @@ function closeTicketModal() { $('ticketModal').classList.add('hidden'); }
 async function saveTicket(e) {
   e.preventDefault();
   const body = { title: $('tTitle').value, description: $('tDesc').value, priority: $('tPriority').value };
-  const assigned = $('tAssigned').value.trim();
+  const assigned = $('tAssigned').disabled ? '' : $('tAssigned').value.trim();
   if (assigned) body.assignedToUsername = assigned;
   try {
     if (state.editingId) {
@@ -725,23 +1110,21 @@ async function saveTicket(e) {
   } catch (err) { toast(err.message, 'err'); }
 }
 
-/* ---------- yorumlar ---------- */
-function toggleComments(ctx, id) {
-  const key = ctx + '-' + id;
-  const box = $('cbox-' + key);
-  const willOpen = box.classList.contains('hidden');
-  box.classList.toggle('hidden');
-  if (willOpen) { state.openComments.add(key); loadComments(ctx, id); }
-  else state.openComments.delete(key);
-}
-
+/* ---------- yorumlar (YouTube tarzi: her zaman acik liste + altta yorum kutusu) ---------- */
 async function loadComments(ctx, id) {
+  const key = ctx + '-' + id;
+  const listEl = $('clist-' + key);
+  if (!listEl) return;
   try {
     const list = await api(`/tickets/${id}/comments`);
-    $('clist-' + ctx + '-' + id).innerHTML = list.length
-      ? list.map(c => `<div class="comment"><b>${esc(c.author)}</b><span class="when">${fmtDate(c.createdDate)}</span><br>${esc(c.content)}</div>`).join('')
-      : '<p class="empty" style="font-size:12px">Henüz yorum yapılmamış.</p>';
-  } catch (err) { toast(err.message, 'err'); }
+    listEl.innerHTML = list.length
+      ? list.map(c => `<div class="comment"><div class="comment-head">${userInline(c.author, c.authorRole, c.authorDepartment, c.authorProfileImage)}<span class="when">${fmtDate(c.createdDate)}</span></div><div class="comment-body">${esc(c.content)}</div></div>`).join('')
+      : '<p class="empty" style="font-size:13px">Henüz yorum yapılmamış. İlk yorumu sen yaz!</p>';
+    const countEl = $('ccount-' + key);
+    if (countEl) countEl.textContent = list.length ? `(${list.length})` : '';
+  } catch (err) {
+    listEl.innerHTML = '<p class="empty" style="font-size:13px">Yorumlar yüklenemedi.</p>';
+  }
 }
 
 async function addComment(e, ctx, id) {
@@ -751,7 +1134,6 @@ async function addComment(e, ctx, id) {
     await api(`/tickets/${id}/comments`, { method: 'POST', body: JSON.stringify({ content: input.value }) });
     input.value = '';
     loadComments(ctx, id);
-    loadDashboard();
     toast('Yorum eklendi.', 'ok');
   } catch (err) { toast(err.message, 'err'); }
 }
@@ -760,17 +1142,48 @@ async function addComment(e, ctx, id) {
 async function loadUsers() {
   try {
     const users = await api('/users');
-    $('userTable').innerHTML = '<tr><th>ID</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Rol</th><th>Oluşturduğu</th><th>Atandığı</th><th>Yorumları</th><th>İşlem</th></tr>' +
-      users.map(u => `<tr>
-        <td>${u.id}</td>
-        <td><b>${esc(u.username)}</b></td>
-        <td>${esc(u.email)}</td>
-        <td><span class="badge r-${u.role}">${u.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</span></td>
-        <td>${u.createdTicketCount}</td>
-        <td>${u.assignedTicketCount}</td>
-        <td>${u.commentCount}</td>
-        <td>${u.username === state.username ? '<span style="color:var(--faint);font-size:12px">—</span>' : `<button class="btn small danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Sil</button>`}</td>
-      </tr>`).join('');
+    state.assignableUsers = users;
+    $('userBoard').innerHTML = users.length ? users.map(u => `
+      <div class="user-card">
+        <div class="user-card-head">
+          <div class="user-identity">
+            ${userInline(u.username, u.role, u.department, u.profileImage)}
+            <span class="user-id">ID: ${u.id}</span>
+          </div>
+          <div class="user-action">
+            ${u.username === state.username ? '<span style="color:var(--faint);font-size:13px">—</span>' : `<button class="btn small danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Sil</button>`}
+          </div>
+        </div>
+        <div class="user-details">
+          <div class="user-field user-field-wide">
+            <span class="user-field-label">E-posta</span>
+            <span class="user-field-value">${esc(u.email)}</span>
+          </div>
+          <div class="user-field">
+            <span class="user-field-label">Rol</span>
+            <span class="badge r-${u.role}">${u.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</span>
+          </div>
+          <div class="user-field">
+            <span class="user-field-label">Departman</span>
+            <span class="user-field-value">${u.role === 'ADMIN' ? '—' : deptLabel(u.department)}</span>
+          </div>
+        </div>
+        <div class="user-stats">
+          <div class="user-field user-stat">
+            <span class="user-field-label">Oluşturduğu</span>
+            <span class="user-field-value">${u.createdTicketCount}</span>
+          </div>
+          <div class="user-field user-stat">
+            <span class="user-field-label">Atandığı</span>
+            <span class="user-field-value">${u.assignedTicketCount}</span>
+          </div>
+          <div class="user-field user-stat">
+            <span class="user-field-label">Yorumları</span>
+            <span class="user-field-value">${u.commentCount}</span>
+          </div>
+        </div>
+      </div>
+    `).join('') : '<p class="empty">Kullanıcı bulunamadı.</p>';
   } catch (err) { toast(err.message, 'err'); }
 }
 
@@ -795,25 +1208,64 @@ const ACTION_TR = {
 async function loadAudit() {
   try {
     state.auditLogs = await api('/audit-logs');
+    state.auditPage = 0;
     renderAudit();
   } catch (err) { toast(err.message, 'err'); }
 }
 
-/* Islem kayitlarinda canli arama: kullanici adi, islem turu ve detayda gecen metne bakar */
+function onAuditSearchInput() {
+  state.auditPage = 0;
+  renderAudit();
+}
+
+function changeAuditPage(delta) {
+  state.auditPage += delta;
+  renderAudit();
+}
+
+function ticketTag(ticketId) {
+  return ticketId == null ? '<span style="color:var(--faint)">—</span>' : `<span class="ticket-tag">Ticket ${esc(ticketId)}</span>`;
+}
+
+/* Islem kayitlarinda canli arama: kullanici adi, birim, islem turu ve detayda gecen metne bakar.
+   Islem turu filtresi: TICKET secilirse tum ticket islemleri (olusturma/guncelleme/silme/durum)
+   tek bakista listelenir - giris kayitlari arasinda kaybolmaz. */
+const TICKET_ACTIONS = ['TICKET_CREATED', 'TICKET_UPDATED', 'TICKET_DELETED', 'STATUS_CHANGED'];
+
 function renderAudit() {
   const logs = state.auditLogs || [];
   const query = ($('auditSearch').value || '').trim().toLowerCase();
-  const filtered = !query ? logs : logs.filter(l =>
-    (l.username || '').toLowerCase().includes(query) ||
-    (ACTION_TR[l.action] || l.action || '').toLowerCase().includes(query) ||
-    (l.details || '').toLowerCase().includes(query) ||
-    String(l.ticketId || '').includes(query)
-  );
+  const type = $('auditType') ? $('auditType').value : '';
+  const filtered = logs.filter(l => {
+    if (type === 'TICKET' && !TICKET_ACTIONS.includes(l.action)) return false;
+    if (type && type !== 'TICKET' && l.action !== type) return false;
+    if (!query) return true;
+    return (l.username || '').toLowerCase().includes(query) ||
+      roleLabel(l.userRole, l.userDepartment).toLowerCase().includes(query) ||
+      deptLabel(l.userDepartment).toLowerCase().includes(query) ||
+      (ACTION_TR[l.action] || l.action || '').toLowerCase().includes(query) ||
+      (l.details || '').toLowerCase().includes(query) ||
+      String(l.ticketId || '').includes(query);
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / state.auditPageSize));
+  if (state.auditPage < 0) state.auditPage = 0;
+  if (state.auditPage >= totalPages) state.auditPage = totalPages - 1;
+
+  const start = state.auditPage * state.auditPageSize;
+  const pageItems = filtered.slice(start, start + state.auditPageSize);
+  const rows = pageItems.length
+    ? pageItems.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td>${userInline(l.username, l.userRole, l.userDepartment, l.userProfileImage)}</td><td>${ticketTag(l.ticketId)}</td><td>${esc(l.details)}</td></tr>`).join('')
+    : '<tr><td colspan="5" class="empty">Kayıt bulunamadı.</td></tr>';
+
   $('auditTable').innerHTML = '<tr><th>Zaman</th><th>İşlem</th><th>Kullanıcı</th><th>Ticket</th><th>Detay</th></tr>' +
-    filtered.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.timestamp)}</td><td>${ACTION_TR[l.action] || l.action}</td><td><b>${esc(l.username)}</b></td><td>${l.ticketId ?? '—'}</td><td>${esc(l.details)}</td></tr>`).join('');
-  $('auditCount').textContent = query
+    rows;
+  $('auditCount').textContent = (query || type)
     ? `${filtered.length} / ${logs.length} kayıt eşleşti`
     : `${logs.length} kayıt`;
+  $('auditPageInfo').textContent = `Sayfa ${state.auditPage + 1} / ${totalPages}`;
+  $('auditPrevBtn').disabled = state.auditPage <= 0;
+  $('auditNextBtn').disabled = state.auditPage >= totalPages - 1;
 }
 
 /* ---------- oturumu hatirla ---------- */
