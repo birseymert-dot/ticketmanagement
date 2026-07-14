@@ -25,6 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Locale;
+
 /**
  * Tum is kurallari bu service katmaninda uygulanir (controller'da degil):
  * 1. Ticket olusturuldugunda status otomatik OPEN olur.
@@ -63,6 +66,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
+        ticket.setExpiresAt(calculateExpiresAt(request.getPriority(), LocalDateTime.now()));
         // Is kurali #1: status otomatik OPEN
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedBy(creator);
@@ -84,6 +88,7 @@ public class TicketServiceImpl implements TicketService {
                                                    TicketPriority priority,
                                                    Long assignedToId,
                                                    String searchName,
+                                                   String view,
                                                    Pageable pageable,
                                                    String username) {
         User user = findUser(username);
@@ -91,14 +96,16 @@ public class TicketServiceImpl implements TicketService {
         // Bos arama metni filtre uygulanmamis sayilir
         String search = (searchName == null || searchName.trim().isEmpty()) ? null : searchName.trim();
         Department searchDepartment = Department.fromSearchText(search);
+        String ticketView = normalizeTicketView(view);
 
         Page<Ticket> page;
-        if (user.getRole() == Role.ADMIN) {
-            // ADMIN tum ticket'lari gorebilir
+        if (user.getRole() == Role.ADMIN && "ALL".equals(ticketView)) {
+            // ADMIN ana Ticket'lar ekraninda tum ticket'lari gorebilir
             page = ticketRepository.findAllWithFilters(status, priority, assignedToId, search, searchDepartment, pageable);
         } else {
-            // USER sadece kendi olusturdugu veya kendisine atanan ticket'lari gorur
-            page = ticketRepository.findOwnWithFilters(user.getId(), status, priority, assignedToId, search, searchDepartment, pageable);
+            // USER kendi olusturdugu veya kendisine atanan ticket'lari gorur.
+            // ADMIN icin ek bolumlerde sadece kendisine atanan / kendi actigi ticket'lar listelenir.
+            page = ticketRepository.findOwnWithFilters(user.getId(), ticketView, status, priority, assignedToId, search, searchDepartment, pageable);
         }
         return PageResponse.from(page, TicketResponse::from);
     }
@@ -109,8 +116,8 @@ public class TicketServiceImpl implements TicketService {
         User user = findUser(username);
         Ticket ticket = findTicket(id);
 
-        // USER sadece kendi olusturdugu ticket'i goruntuleyebilir (ADMIN hepsini)
-        if (user.getRole() != Role.ADMIN && !isCreator(ticket, user)) {
+        // USER kendi olusturdugu veya kendisine atanan ticket'i goruntuleyebilir (ADMIN hepsini)
+        if (user.getRole() != Role.ADMIN && !isCreatorOrAssignee(ticket, user)) {
             throw new ForbiddenException("Bu ticket'i goruntuleme yetkiniz yok");
         }
         return TicketResponse.from(ticket);
@@ -131,6 +138,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
+        ticket.setExpiresAt(calculateExpiresAt(request.getPriority(), ticket.getCreatedDate()));
 
         User assignee = resolveAssignee(request.getAssignedToId(), request.getAssignedToUsername());
         if (assignee != null) {
@@ -244,5 +252,37 @@ public class TicketServiceImpl implements TicketService {
 
     private boolean isCreator(Ticket ticket, User user) {
         return ticket.getCreatedBy().getId().equals(user.getId());
+    }
+
+    private boolean isAssignee(Ticket ticket, User user) {
+        return ticket.getAssignedTo() != null && ticket.getAssignedTo().getId().equals(user.getId());
+    }
+
+    private boolean isCreatorOrAssignee(Ticket ticket, User user) {
+        return isCreator(ticket, user) || isAssignee(ticket, user);
+    }
+
+    private String normalizeTicketView(String view) {
+        if (view == null || view.trim().isEmpty()) {
+            return "ALL";
+        }
+        String normalized = view.trim().toUpperCase(Locale.ROOT);
+        if ("ALL".equals(normalized) || "ASSIGNED".equals(normalized) || "CREATED".equals(normalized)) {
+            return normalized;
+        }
+        throw new BadRequestException("Gecersiz ticket gorunumu: " + view);
+    }
+
+    private LocalDateTime calculateExpiresAt(TicketPriority priority, LocalDateTime start) {
+        LocalDateTime baseTime = start != null ? start : LocalDateTime.now();
+        return baseTime.plusHours(slaHours(priority));
+    }
+
+    private long slaHours(TicketPriority priority) {
+        return switch (priority) {
+            case HIGH -> 4L;
+            case MEDIUM -> 24L;
+            case LOW -> 72L;
+        };
     }
 }

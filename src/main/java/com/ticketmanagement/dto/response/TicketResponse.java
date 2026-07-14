@@ -26,6 +26,9 @@ public class TicketResponse {
     private String assignedToProfileImage;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+    private LocalDateTime expiresAt;
+    private long slaHours;
+    private boolean expired;
 
     public static TicketResponse from(Ticket ticket) {
         TicketResponse response = new TicketResponse();
@@ -45,7 +48,29 @@ public class TicketResponse {
         response.assignedToProfileImage = ticket.getAssignedTo() != null ? ticket.getAssignedTo().getProfileImage() : null;
         response.createdDate = ticket.getCreatedDate();
         response.updatedDate = ticket.getUpdatedDate();
+        response.slaHours = slaHours(ticket.getPriority());
+        response.expiresAt = ticket.getExpiresAt() != null
+                ? ticket.getExpiresAt()
+                : calculateExpiresAt(ticket.getPriority(), ticket.getCreatedDate());
+        response.expired = ticket.getStatus() != TicketStatus.DONE
+                && response.expiresAt != null
+                && LocalDateTime.now().isAfter(response.expiresAt);
         return response;
+    }
+
+    private static long slaHours(TicketPriority priority) {
+        return switch (priority) {
+            case HIGH -> 4L;
+            case MEDIUM -> 24L;
+            case LOW -> 72L;
+        };
+    }
+
+    private static LocalDateTime calculateExpiresAt(TicketPriority priority, LocalDateTime start) {
+        if (priority == null || start == null) {
+            return null;
+        }
+        return start.plusHours(slaHours(priority));
     }
 
     public Long getId() {
@@ -110,5 +135,17 @@ public class TicketResponse {
 
     public LocalDateTime getUpdatedDate() {
         return updatedDate;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public long getSlaHours() {
+        return slaHours;
+    }
+
+    public boolean isExpired() {
+        return expired;
     }
 }

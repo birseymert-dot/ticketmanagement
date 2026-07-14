@@ -17,6 +17,7 @@ public interface TicketService {
                                             TicketPriority priority,
                                             Long assignedToId,
                                             String searchName,
+                                            String view,
                                             Pageable pageable,
                                             String username);
 

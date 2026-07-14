@@ -84,17 +84,25 @@ class CommentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Atanan kullanici (olusturan degilse) yorum ekleyememelidir")
-    void addComment_shouldRejectAssignee() {
+    @DisplayName("Atanan kullanici yorum ekleyebilmelidir")
+    void addComment_shouldAllowAssignee() {
         CommentRequest request = new CommentRequest();
         request.setContent("Inceliyorum");
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findByUsername("assignee")).thenReturn(Optional.of(assignee));
+        when(commentRepository.save(any(Comment.class))).thenAnswer(inv -> {
+            Comment comment = inv.getArgument(0);
+            comment.setId(101L);
+            comment.setCreatedDate(LocalDateTime.now());
+            return comment;
+        });
 
-        assertThrows(ForbiddenException.class,
-                () -> commentService.addComment(10L, request, "assignee"));
-        verify(commentRepository, never()).save(any(Comment.class));
+        CommentResponse response = commentService.addComment(10L, request, "assignee");
+
+        assertEquals("Inceliyorum", response.getContent());
+        assertEquals("assignee", response.getAuthor());
+        assertEquals(10L, response.getTicketId());
     }
 
     @Test
@@ -147,4 +155,3 @@ class CommentServiceImplTest {
         return user;
     }
 }
-

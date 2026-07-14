@@ -35,9 +35,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                                     @Param("searchDepartment") Department searchDepartment,
                                     Pageable pageable);
 
-    /** USER icin: SADECE kendi olusturdugu ticket'lar (+ ayni filtreler). */
+    /**
+     * USER ve ADMIN alt bolumleri icin: kendi olusturdugu veya kendisine atanan ticket'lar (+ ayni filtreler).
+     * view=ASSIGNED sadece atananlari, view=CREATED sadece olusturdugu ticket'lari listeler.
+     */
     @Query("SELECT t FROM Ticket t LEFT JOIN t.assignedTo assignee JOIN t.createdBy creator " +
-            "WHERE creator.id = :userId " +
+            "WHERE ((:view = 'ASSIGNED' AND assignee.id = :userId) " +
+            "OR (:view = 'CREATED' AND creator.id = :userId) " +
+            "OR ((:view IS NULL OR :view = 'ALL') AND (creator.id = :userId OR assignee.id = :userId))) " +
             "AND (:status IS NULL OR t.status = :status) " +
             "AND (:priority IS NULL OR t.priority = :priority) " +
             "AND (:assignedToId IS NULL OR assignee.id = :assignedToId) " +
@@ -46,6 +51,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             "     OR LOWER(assignee.username) LIKE LOWER(CONCAT('%', :searchName, '%')) " +
             "     OR (:searchDepartment IS NOT NULL AND (creator.department = :searchDepartment OR assignee.department = :searchDepartment)))")
     Page<Ticket> findOwnWithFilters(@Param("userId") Long userId,
+                                    @Param("view") String view,
                                     @Param("status") TicketStatus status,
                                     @Param("priority") TicketPriority priority,
                                     @Param("assignedToId") Long assignedToId,
@@ -55,11 +61,11 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     long countByStatus(TicketStatus status);
 
-    @Query("SELECT COUNT(t) FROM Ticket t WHERE t.createdBy.id = :userId")
+    @Query("SELECT COUNT(t) FROM Ticket t WHERE t.createdBy.id = :userId OR t.assignedTo.id = :userId")
     long countVisibleByUserId(@Param("userId") Long userId);
 
     @Query("SELECT COUNT(t) FROM Ticket t " +
-            "WHERE t.createdBy.id = :userId " +
+            "WHERE (t.createdBy.id = :userId OR t.assignedTo.id = :userId) " +
             "AND t.status = :status")
     long countVisibleByUserIdAndStatus(@Param("userId") Long userId,
                                        @Param("status") TicketStatus status);
@@ -72,10 +78,17 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findByAssignedToId(Long userId);
 
-    List<Ticket> findTop5ByOrderByCreatedDateDesc();
+    List<Ticket> findTop8ByOrderByCreatedDateDesc();
+
+    List<Ticket> findAllByOrderByCreatedDateDesc();
 
     @Query("SELECT t FROM Ticket t " +
-            "WHERE t.createdBy.id = :userId " +
+            "WHERE t.createdBy.id = :userId OR t.assignedTo.id = :userId " +
             "ORDER BY t.createdDate DESC")
     List<Ticket> findVisibleTopByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT t FROM Ticket t " +
+            "WHERE t.createdBy.id = :userId OR t.assignedTo.id = :userId " +
+            "ORDER BY t.createdDate DESC")
+    List<Ticket> findVisibleByUserIdOrderByCreatedDateDesc(@Param("userId") Long userId);
 }

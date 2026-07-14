@@ -58,6 +58,8 @@ public class Ticket {
 
     private LocalDateTime updatedDate;
 
+    private LocalDateTime expiresAt;
+
     @PrePersist
     protected void onCreate() {
         this.createdDate = LocalDateTime.now();
@@ -147,5 +149,13 @@ public class Ticket {
 
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
     }
 }

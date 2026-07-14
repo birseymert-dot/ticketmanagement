@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -117,10 +118,12 @@ class TicketServiceImplTest {
         assertEquals(TicketStatus.OPEN, response.getStatus());
         assertEquals("Yeni Ticket", response.getTitle());
         assertEquals("creator", response.getCreatedBy());
+        assertNotNull(response.getExpiresAt());
 
         ArgumentCaptor<Ticket> captor = ArgumentCaptor.forClass(Ticket.class);
         verify(ticketRepository).save(captor.capture());
         assertEquals(TicketStatus.OPEN, captor.getValue().getStatus());
+        assertNotNull(captor.getValue().getExpiresAt());
     }
 
     // ------------------------------------------------------------------

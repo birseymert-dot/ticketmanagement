@@ -15,15 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,22 +45,19 @@ class DashboardServiceImplTest {
         Ticket visibleTicket = buildTicket(10L, user);
 
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
-        when(ticketRepository.countVisibleByUserId(1L)).thenReturn(1L);
-        when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.OPEN)).thenReturn(1L);
-        when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.IN_PROGRESS)).thenReturn(0L);
-        when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.HOLD)).thenReturn(0L);
-        when(ticketRepository.countVisibleByUserIdAndStatus(1L, TicketStatus.DONE)).thenReturn(0L);
-        when(ticketRepository.findVisibleTopByUserId(eq(1L), any(Pageable.class)))
-                .thenReturn(List.of(visibleTicket));
+        when(ticketRepository.findVisibleByUserIdOrderByCreatedDateDesc(1L)).thenReturn(List.of(visibleTicket));
 
         DashboardResponse response = dashboardService.getDashboard("user");
 
         assertEquals(1L, response.getTotalTickets());
         assertEquals(1L, response.getTicketsByStatus().get("OPEN"));
+        assertEquals(1L, response.getNewTicketsToday());
+        assertEquals(1L, response.getOpenedThisWeek());
+        assertEquals(1L, response.getUnresolvedTickets());
         assertEquals(1, response.getLastFiveTickets().size());
         assertEquals("User ticket", response.getLastFiveTickets().get(0).getTitle());
         verify(ticketRepository, never()).count();
-        verify(ticketRepository, never()).findTop5ByOrderByCreatedDateDesc();
+        verify(ticketRepository, never()).findAllByOrderByCreatedDateDesc();
     }
 
     @Test
@@ -74,17 +68,13 @@ class DashboardServiceImplTest {
         Ticket ticket = buildTicket(20L, admin);
 
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
-        when(ticketRepository.count()).thenReturn(1L);
-        when(ticketRepository.countByStatus(TicketStatus.OPEN)).thenReturn(1L);
-        when(ticketRepository.countByStatus(TicketStatus.IN_PROGRESS)).thenReturn(0L);
-        when(ticketRepository.countByStatus(TicketStatus.HOLD)).thenReturn(0L);
-        when(ticketRepository.countByStatus(TicketStatus.DONE)).thenReturn(0L);
-        when(ticketRepository.findTop5ByOrderByCreatedDateDesc()).thenReturn(List.of(ticket));
+        when(ticketRepository.findAllByOrderByCreatedDateDesc()).thenReturn(List.of(ticket));
 
         DashboardResponse response = dashboardService.getDashboard("admin");
 
         assertEquals(1L, response.getTotalTickets());
         assertEquals(1L, response.getTicketsByStatus().get("OPEN"));
+        assertEquals(1L, response.getOpenTicketsByPriority().get("MEDIUM"));
         assertEquals(1, response.getLastFiveTickets().size());
         verify(ticketRepository, never()).countVisibleByUserId(2L);
     }
@@ -103,4 +93,3 @@ class DashboardServiceImplTest {
         return ticket;
     }
 }
-

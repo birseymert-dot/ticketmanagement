@@ -53,12 +53,13 @@ public class TicketController {
             @RequestParam(required = false) TicketPriority priority,
             @RequestParam(required = false) Long assignedToId,
             @RequestParam(required = false) String searchUser,
+            @RequestParam(required = false) String view,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "8") int size,
             Authentication authentication) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
         return ResponseEntity.ok(
-                ticketService.getTickets(status, priority, assignedToId, searchUser, pageable, authentication.getName()));
+                ticketService.getTickets(status, priority, assignedToId, searchUser, view, pageable, authentication.getName()));
     }
 
     @GetMapping("/{id}")
