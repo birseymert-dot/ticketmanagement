@@ -9,14 +9,27 @@ public class DashboardResponse {
     private Map<String, Long> ticketsByStatus;
     private Map<String, Long> ticketsByStatusThisWeek;
     private Map<String, Long> openTicketsByPriority;
+    private Map<String, Long> reportTicketsByStatus;
+    private Map<String, Long> reportTicketsByPriority;
+    private Map<String, Long> reportOpenTicketsByPriority;
     private List<TicketResponse> lastFiveTickets;
+    private String reportDate;
+    private String weekStartDate;
+    private String weekEndDate;
+    private long reportOpenedTickets;
+    private long reportSolvedTickets;
+    private long reportOverdueTickets;
+    private long reportUnresolvedTickets;
     private long newTicketsToday;
     private long expiredTicketsToday;
+    private long expiredTicketsThisWeek;
     private long overdueTickets;
     private long openedThisWeek;
     private long solvedThisWeek;
     private long unresolvedTickets;
     private long unassignedTickets;
+    private List<AssigneeStat> reportAssignees;
+    private List<SolverStat> topSolversReportDate;
     private List<SolverStat> topSolversThisWeek;
     private List<DailyTicketStat> weeklyVolume;
 
@@ -61,12 +74,92 @@ public class DashboardResponse {
         this.openTicketsByPriority = openTicketsByPriority;
     }
 
+    public Map<String, Long> getReportTicketsByStatus() {
+        return reportTicketsByStatus;
+    }
+
+    public void setReportTicketsByStatus(Map<String, Long> reportTicketsByStatus) {
+        this.reportTicketsByStatus = reportTicketsByStatus;
+    }
+
+    public Map<String, Long> getReportOpenTicketsByPriority() {
+        return reportOpenTicketsByPriority;
+    }
+
+    public Map<String, Long> getReportTicketsByPriority() {
+        return reportTicketsByPriority;
+    }
+
+    public void setReportTicketsByPriority(Map<String, Long> reportTicketsByPriority) {
+        this.reportTicketsByPriority = reportTicketsByPriority;
+    }
+
+    public void setReportOpenTicketsByPriority(Map<String, Long> reportOpenTicketsByPriority) {
+        this.reportOpenTicketsByPriority = reportOpenTicketsByPriority;
+    }
+
     public List<TicketResponse> getLastFiveTickets() {
         return lastFiveTickets;
     }
 
     public void setLastFiveTickets(List<TicketResponse> lastFiveTickets) {
         this.lastFiveTickets = lastFiveTickets;
+    }
+
+    public String getReportDate() {
+        return reportDate;
+    }
+
+    public void setReportDate(String reportDate) {
+        this.reportDate = reportDate;
+    }
+
+    public String getWeekStartDate() {
+        return weekStartDate;
+    }
+
+    public void setWeekStartDate(String weekStartDate) {
+        this.weekStartDate = weekStartDate;
+    }
+
+    public String getWeekEndDate() {
+        return weekEndDate;
+    }
+
+    public void setWeekEndDate(String weekEndDate) {
+        this.weekEndDate = weekEndDate;
+    }
+
+    public long getReportOpenedTickets() {
+        return reportOpenedTickets;
+    }
+
+    public void setReportOpenedTickets(long reportOpenedTickets) {
+        this.reportOpenedTickets = reportOpenedTickets;
+    }
+
+    public long getReportSolvedTickets() {
+        return reportSolvedTickets;
+    }
+
+    public void setReportSolvedTickets(long reportSolvedTickets) {
+        this.reportSolvedTickets = reportSolvedTickets;
+    }
+
+    public long getReportOverdueTickets() {
+        return reportOverdueTickets;
+    }
+
+    public void setReportOverdueTickets(long reportOverdueTickets) {
+        this.reportOverdueTickets = reportOverdueTickets;
+    }
+
+    public long getReportUnresolvedTickets() {
+        return reportUnresolvedTickets;
+    }
+
+    public void setReportUnresolvedTickets(long reportUnresolvedTickets) {
+        this.reportUnresolvedTickets = reportUnresolvedTickets;
     }
 
     public long getNewTicketsToday() {
@@ -83,6 +176,14 @@ public class DashboardResponse {
 
     public void setExpiredTicketsToday(long expiredTicketsToday) {
         this.expiredTicketsToday = expiredTicketsToday;
+    }
+
+    public long getExpiredTicketsThisWeek() {
+        return expiredTicketsThisWeek;
+    }
+
+    public void setExpiredTicketsThisWeek(long expiredTicketsThisWeek) {
+        this.expiredTicketsThisWeek = expiredTicketsThisWeek;
     }
 
     public long getOverdueTickets() {
@@ -123,6 +224,22 @@ public class DashboardResponse {
 
     public void setUnassignedTickets(long unassignedTickets) {
         this.unassignedTickets = unassignedTickets;
+    }
+
+    public List<AssigneeStat> getReportAssignees() {
+        return reportAssignees;
+    }
+
+    public void setReportAssignees(List<AssigneeStat> reportAssignees) {
+        this.reportAssignees = reportAssignees;
+    }
+
+    public List<SolverStat> getTopSolversReportDate() {
+        return topSolversReportDate;
+    }
+
+    public void setTopSolversReportDate(List<SolverStat> topSolversReportDate) {
+        this.topSolversReportDate = topSolversReportDate;
     }
 
     public List<SolverStat> getTopSolversThisWeek() {
@@ -177,6 +294,45 @@ public class DashboardResponse {
 
         public long getSolvedCount() {
             return solvedCount;
+        }
+    }
+
+    public static class AssigneeStat {
+        private String username;
+        private String role;
+        private String department;
+        private String profileImage;
+        private long ticketCount;
+
+        public AssigneeStat() {
+        }
+
+        public AssigneeStat(String username, String role, String department, String profileImage, long ticketCount) {
+            this.username = username;
+            this.role = role;
+            this.department = department;
+            this.profileImage = profileImage;
+            this.ticketCount = ticketCount;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public String getDepartment() {
+            return department;
+        }
+
+        public String getProfileImage() {
+            return profileImage;
+        }
+
+        public long getTicketCount() {
+            return ticketCount;
         }
     }
 

@@ -75,6 +75,10 @@ class DashboardServiceImplTest {
         assertEquals(1L, response.getTotalTickets());
         assertEquals(1L, response.getTicketsByStatus().get("OPEN"));
         assertEquals(1L, response.getOpenTicketsByPriority().get("MEDIUM"));
+        assertEquals(1L, response.getReportTicketsByStatus().get("OPEN"));
+        assertEquals(1L, response.getReportTicketsByPriority().get("MEDIUM"));
+        assertEquals("admin", response.getReportAssignees().get(0).getUsername());
+        assertEquals(1L, response.getReportAssignees().get(0).getTicketCount());
         assertEquals(1, response.getLastFiveTickets().size());
         verify(ticketRepository, never()).countVisibleByUserId(2L);
     }

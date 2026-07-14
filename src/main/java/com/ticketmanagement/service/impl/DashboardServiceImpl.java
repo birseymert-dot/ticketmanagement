@@ -36,6 +36,12 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public DashboardResponse getDashboard(String username) {
+        return getDashboard(username, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DashboardResponse getDashboard(String username, LocalDate reportDate) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Kullanici bulunamadi: " + username));
         List<Ticket> tickets = user.getRole() == Role.ADMIN
@@ -43,22 +49,43 @@ public class DashboardServiceImpl implements DashboardService {
                 : ticketRepository.findVisibleByUserIdOrderByCreatedDateDesc(user.getId());
 
         LocalDate today = LocalDate.now();
+        LocalDate selectedDate = reportDate != null ? reportDate : today;
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime todayStart = today.atStartOfDay();
         LocalDateTime tomorrowStart = today.plusDays(1).atStartOfDay();
         LocalDateTime weekStart = today.minusDays(today.getDayOfWeek().getValue() - 1L).atStartOfDay();
+        LocalDateTime weekEnd = weekStart.plusDays(7);
+        LocalDateTime reportStart = selectedDate.atStartOfDay();
+        LocalDateTime reportEnd = selectedDate.plusDays(1).atStartOfDay();
+
+        List<Ticket> reportCreatedTickets = tickets.stream()
+                .filter(ticket -> isBetween(ticket.getCreatedDate(), reportStart, reportEnd))
+                .toList();
 
         DashboardResponse response = new DashboardResponse();
+        response.setReportDate(selectedDate.toString());
+        response.setWeekStartDate(weekStart.toLocalDate().toString());
+        response.setWeekEndDate(weekEnd.toLocalDate().minusDays(1).toString());
         response.setTotalTickets(tickets.size());
         response.setTicketsByStatus(statusCounts(tickets));
         response.setTicketsByStatusThisWeek(statusCounts(tickets.stream()
                 .filter(ticket -> isOnOrAfter(ticket.getCreatedDate(), weekStart))
                 .toList()));
         response.setOpenTicketsByPriority(openPriorityCounts(tickets));
+        response.setReportTicketsByStatus(statusCounts(reportCreatedTickets));
+        response.setReportTicketsByPriority(priorityCounts(reportCreatedTickets));
+        response.setReportOpenTicketsByPriority(openPriorityCounts(reportCreatedTickets));
+        response.setReportAssignees(assigneeCounts(reportCreatedTickets));
         response.setLastFiveTickets(tickets.stream()
                 .limit(8)
                 .map(TicketResponse::from)
                 .toList());
+        response.setReportOpenedTickets(reportCreatedTickets.size());
+        response.setReportSolvedTickets(countSolvedBetween(tickets, reportStart, reportEnd));
+        response.setReportOverdueTickets(countExpiredBetween(tickets, reportStart, reportEnd, now));
+        response.setReportUnresolvedTickets(reportCreatedTickets.stream()
+                .filter(ticket -> ticket.getStatus() != TicketStatus.DONE)
+                .count());
         response.setNewTicketsToday(countCreatedBetween(tickets, todayStart, tomorrowStart));
         response.setOpenedThisWeek(tickets.stream()
                 .filter(ticket -> isOnOrAfter(ticket.getCreatedDate(), weekStart))
@@ -67,6 +94,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .filter(ticket -> ticket.getStatus() == TicketStatus.DONE)
                 .filter(ticket -> isOnOrAfter(ticket.getUpdatedDate(), weekStart))
                 .count());
+        response.setExpiredTicketsThisWeek(countExpiredBetween(tickets, weekStart, weekEnd, now));
         response.setUnresolvedTickets(tickets.stream()
                 .filter(ticket -> ticket.getStatus() != TicketStatus.DONE)
                 .count());
@@ -84,6 +112,7 @@ public class DashboardServiceImpl implements DashboardService {
                     return expiresAt != null && expiresAt.toLocalDate().equals(today);
                 })
                 .count());
+        response.setTopSolversReportDate(topSolversBetween(tickets, reportStart, reportEnd));
         response.setTopSolversThisWeek(topSolversThisWeek(tickets, weekStart));
         response.setWeeklyVolume(weeklyVolume(tickets, today));
 
@@ -114,15 +143,81 @@ public class DashboardServiceImpl implements DashboardService {
         return counts;
     }
 
+    private Map<String, Long> priorityCounts(List<Ticket> tickets) {
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (TicketPriority priority : TicketPriority.values()) {
+            counts.put(priority.name(), 0L);
+        }
+        for (Ticket ticket : tickets) {
+            counts.put(ticket.getPriority().name(), counts.get(ticket.getPriority().name()) + 1L);
+        }
+        return counts;
+    }
+
+    private List<DashboardResponse.AssigneeStat> assigneeCounts(List<Ticket> tickets) {
+        Map<Long, Long> counts = new HashMap<>();
+        Map<Long, User> users = new HashMap<>();
+        long unassignedCount = 0L;
+
+        for (Ticket ticket : tickets) {
+            User assignee = ticket.getAssignedTo();
+            if (assignee == null) {
+                unassignedCount++;
+                continue;
+            }
+            counts.merge(assignee.getId(), 1L, Long::sum);
+            users.put(assignee.getId(), assignee);
+        }
+
+        List<DashboardResponse.AssigneeStat> stats = counts.entrySet().stream()
+                .sorted(Map.Entry.<Long, Long>comparingByValue(Comparator.reverseOrder()))
+                .map(entry -> {
+                    User assignee = users.get(entry.getKey());
+                    return new DashboardResponse.AssigneeStat(
+                            assignee.getUsername(),
+                            assignee.getRole().name(),
+                            assignee.getDepartment() != null ? assignee.getDepartment().name() : null,
+                            assignee.getProfileImage(),
+                            entry.getValue()
+                    );
+                })
+                .toList();
+
+        if (unassignedCount == 0L) {
+            return stats;
+        }
+
+        java.util.ArrayList<DashboardResponse.AssigneeStat> withUnassigned = new java.util.ArrayList<>(stats);
+        withUnassigned.add(new DashboardResponse.AssigneeStat("Atama yok", null, null, null, unassignedCount));
+        return withUnassigned;
+    }
+
     private long countCreatedBetween(List<Ticket> tickets, LocalDateTime start, LocalDateTime end) {
         return tickets.stream()
-                .filter(ticket -> ticket.getCreatedDate() != null)
-                .filter(ticket -> !ticket.getCreatedDate().isBefore(start) && ticket.getCreatedDate().isBefore(end))
+                .filter(ticket -> isBetween(ticket.getCreatedDate(), start, end))
                 .count();
     }
 
     private boolean isOnOrAfter(LocalDateTime value, LocalDateTime start) {
         return value != null && !value.isBefore(start);
+    }
+
+    private boolean isBetween(LocalDateTime value, LocalDateTime start, LocalDateTime end) {
+        return value != null && !value.isBefore(start) && value.isBefore(end);
+    }
+
+    private long countSolvedBetween(List<Ticket> tickets, LocalDateTime start, LocalDateTime end) {
+        return tickets.stream()
+                .filter(ticket -> ticket.getStatus() == TicketStatus.DONE)
+                .filter(ticket -> isBetween(ticket.getUpdatedDate(), start, end))
+                .count();
+    }
+
+    private long countExpiredBetween(List<Ticket> tickets, LocalDateTime start, LocalDateTime end, LocalDateTime now) {
+        return tickets.stream()
+                .filter(ticket -> isExpired(ticket, now))
+                .filter(ticket -> isBetween(expiresAt(ticket), start, end))
+                .count();
     }
 
     private boolean isExpired(Ticket ticket, LocalDateTime now) {
@@ -151,11 +246,17 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private List<DashboardResponse.SolverStat> topSolversThisWeek(List<Ticket> tickets, LocalDateTime weekStart) {
+        return topSolversBetween(tickets, weekStart, LocalDateTime.now().plusDays(1));
+    }
+
+    private List<DashboardResponse.SolverStat> topSolversBetween(List<Ticket> tickets,
+                                                                 LocalDateTime start,
+                                                                 LocalDateTime end) {
         Map<Long, Long> solvedCounts = new HashMap<>();
         Map<Long, User> users = new HashMap<>();
         for (Ticket ticket : tickets) {
             if (ticket.getStatus() != TicketStatus.DONE
-                    || !isOnOrAfter(ticket.getUpdatedDate(), weekStart)
+                    || !isBetween(ticket.getUpdatedDate(), start, end)
                     || ticket.getAssignedTo() == null) {
                 continue;
             }
