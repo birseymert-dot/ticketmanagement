@@ -214,8 +214,7 @@
   .risk-title { font-size: 12px; font-weight: 700; color: #23527c; line-height: 1.2; }
   .risk-value { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.05; margin-top: 2px; }
 
-  .weekly-summary-card { margin-top: 8px; }
-  .weekly-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .weekly-summary-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
   .weekly-summary-card h2 { margin-bottom: 4px; }
   .weekly-range {
     margin-bottom: 12px; color: var(--muted);
@@ -231,23 +230,31 @@
   }
   .week-stat-icon svg { width: 20px; height: 20px; }
   /* Ticket hacmi grafigi */
-  .volume-card { margin-top: 14px; }
-  .volume-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-  .volume-head h2 { margin-bottom: 0; }
-  .volume-legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
-  .volume-legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-  .legend-opened { background: #2563eb; }
-  .legend-solved { background: #16a34a; }
-  .volume-chart { display: flex; align-items: flex-end; gap: 10px; height: 190px; padding-top: 6px; }
-  .volume-day { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; height: 100%; }
-  .volume-bars { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 5px; }
-  .volume-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
-  .volume-num { font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
-  .volume-bar { width: 18px; border-radius: 3px 3px 0 0; min-height: 2px; }
-  .volume-bar.opened { background: #2563eb; }
-  .volume-bar.solved { background: #16a34a; }
-  .volume-label { font-size: 11px; color: var(--muted); margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border); width: 100%; text-align: center; white-space: nowrap; }
+  /* Oncelik dagilimi halkalari */
+  .dashboard-board {
+    display: grid; grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 14px; align-items: start; margin-top: 8px;
+  }
+  .prio-card h2 { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 14px; }
+  .prio-rings { display: flex; flex-direction: column; gap: 14px; }
+  .prio-row {
+    display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; align-items: center;
+    padding: 12px 14px; border: 1px solid #eef2f7; border-radius: 8px; background: #f8fafc;
+  }
+  .prio-ring { position: relative; width: 64px; height: 64px; }
+  .prio-ring svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+  .prio-ring .ring-bg { fill: none; stroke: #e2e8f0; stroke-width: 5; }
+  .prio-ring .ring-val { fill: none; stroke-width: 5; stroke-linecap: round; }
+  .prio-count {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 800; color: #0f172a; font-variant-numeric: tabular-nums;
+  }
+  .prio-name { font-size: 14px; font-weight: 700; color: #334155; }
+  .prio-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .prio-pct { font-size: 20px; font-weight: 800; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .prio-high { color: #dc2626; }
+  .prio-medium { color: #f59e0b; }
+  .prio-low { color: #2563eb; }
 
   .week-stat-title { color: #334155; font-size: 13px; font-weight: 700; line-height: 1.25; }
   .week-stat-meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
@@ -259,6 +266,7 @@
 
   @media (max-width: 1180px) {
     .risk-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); }
+    .dashboard-board { grid-template-columns: 1fr; }
   }
 
   /* ---------- Ticket listesi ---------- */
@@ -689,20 +697,16 @@
         <h2>Risk Altındaki Ticketlar</h2>
         <div id="riskCards" class="risk-grid"></div>
       </div>
-      <div class="card weekly-summary-card">
-        <h2 id="weeklySummaryTitle">Bu Haftalık Ticket Özeti</h2>
-        <div id="weeklySummaryRange" class="weekly-range"></div>
-        <div id="weeklySummary" class="weekly-summary-grid"></div>
-      </div>
-      <div class="card volume-card">
-        <div class="volume-head">
-          <h2>Ticket Hacmi — Son 7 Gün</h2>
-          <div class="volume-legend">
-            <span><i class="legend-dot legend-opened"></i>Açılan</span>
-            <span><i class="legend-dot legend-solved"></i>Çözülen</span>
-          </div>
+      <div class="dashboard-board">
+        <div class="card prio-card">
+          <h2>Açık Ticketlar — Öncelik Dağılımı</h2>
+          <div id="prioRings" class="prio-rings"></div>
         </div>
-        <div id="volumeChart" class="volume-chart"></div>
+        <div class="card weekly-summary-card">
+          <h2 id="weeklySummaryTitle">Bu Haftalık Ticket Özeti</h2>
+          <div id="weeklySummaryRange" class="weekly-range"></div>
+          <div id="weeklySummary" class="weekly-summary-grid"></div>
+        </div>
       </div>
     </section>
 
@@ -1224,34 +1228,50 @@ async function loadDashboard() {
     state.dashboardData = d;
     renderRiskCards(d);
     renderWeeklySummary(d);
-    renderVolumeChart(d);
+    renderPriorityRings(d);
   } catch (err) { toast(err.message, 'err'); }
 }
 
-/* Son 7 gunun acilan/cozulen ticket sayilarini tarih etiketli cubuk grafikte gosterir. */
-function renderVolumeChart(d) {
-  const days = d.weeklyVolume || [];
-  if (!$('volumeChart')) return;
-  if (!days.length) {
-    $('volumeChart').innerHTML = '<p class="empty">Grafik için veri bulunamadı.</p>';
+/* Acik (tamamlanmamis) ticket'larin oncelik dagilimini dairesel
+   ilerleme halkalariyla gosterir: halkanin dolulugu = o onceligin
+   acik ticket'lar icindeki orani. */
+function renderPriorityRings(d) {
+  if (!$('prioRings')) return;
+  const priority = d.openTicketsByPriority || {};
+  const high = priority.HIGH || 0;
+  const medium = priority.MEDIUM || 0;
+  const low = priority.LOW || 0;
+  const total = high + medium + low;
+  if (!total) {
+    $('prioRings').innerHTML = '<p class="empty">Şu an açık ticket bulunmuyor.</p>';
     return;
   }
-  const max = Math.max(1, ...days.map(day => Math.max(day.opened || 0, day.solved || 0)));
-  const barHeight = value => Math.round(((value || 0) / max) * 130);
-  $('volumeChart').innerHTML = days.map(day => `
-    <div class="volume-day">
-      <div class="volume-bars">
-        <div class="volume-col">
-          <div class="volume-num">${countText(day.opened)}</div>
-          <div class="volume-bar opened" style="height:${barHeight(day.opened)}px"></div>
-        </div>
-        <div class="volume-col">
-          <div class="volume-num">${countText(day.solved)}</div>
-          <div class="volume-bar solved" style="height:${barHeight(day.solved)}px"></div>
-        </div>
+  const rows = [
+    { key: 'high', name: 'Yüksek (HIGH)', count: high, color: '#dc2626' },
+    { key: 'medium', name: 'Orta (MEDIUM)', count: medium, color: '#f59e0b' },
+    { key: 'low', name: 'Düşük (LOW)', count: low, color: '#2563eb' }
+  ];
+  const R = 28, C = 2 * Math.PI * R;
+  $('prioRings').innerHTML = rows.map(row => {
+    const pct = Math.round((row.count / total) * 100);
+    const dash = (row.count / total) * C;
+    return `
+    <div class="prio-row">
+      <div class="prio-ring">
+        <svg viewBox="0 0 64 64">
+          <circle class="ring-bg" cx="32" cy="32" r="${R}"></circle>
+          <circle class="ring-val" cx="32" cy="32" r="${R}" stroke="${row.color}"
+                  stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}"></circle>
+        </svg>
+        <span class="prio-count prio-${row.key}">${countText(row.count)}</span>
       </div>
-      <div class="volume-label">${esc(day.label)}</div>
-    </div>`).join('');
+      <div>
+        <div class="prio-name">${esc(row.name)}</div>
+        <div class="prio-sub">Açık ticket'ların %${pct}'i</div>
+      </div>
+      <div class="prio-pct">%${pct}</div>
+    </div>`;
+  }).join('');
 }
 
 function countText(value) {
