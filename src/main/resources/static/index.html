@@ -189,7 +189,7 @@
 
   /* ---------- Dashboard ---------- */
   .risk-panel { padding: 18px 20px 16px; margin-bottom: 8px; }
-  .risk-panel h2, .quick-report-card h2, .weekly-summary-card h2 {
+  .risk-panel h2, .weekly-summary-card h2 {
     font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 12px;
   }
   .risk-grid {
@@ -214,70 +214,8 @@
   .risk-title { font-size: 12px; font-weight: 700; color: #23527c; line-height: 1.2; }
   .risk-value { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.05; margin-top: 2px; }
 
-  .dashboard-board {
-    display: grid; grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 14px; align-items: start; margin-top: 8px;
-  }
-  .quick-report-card, .weekly-summary-card { min-height: 0; }
-  .quick-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-  .quick-head h2 { margin-bottom: 0; }
-  .report-date-filter {
-    margin-left: auto; display: inline-flex; align-items: center; gap: 0;
-    height: 34px; padding: 3px; border: 1px solid var(--border); border-radius: 7px;
-    background: #f8fafc; box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
-  }
-  .period-label {
-    padding: 0 8px; color: var(--muted);
-    font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .period-box {
-    height: 28px; width: 128px; min-width: 128px; padding: 0 8px;
-    border: 0; border-left: 1px solid var(--border); border-radius: 0;
-    font-size: 12px; color: #334155; background: transparent;
-  }
-  .period-box:focus { border-left-color: #cbd5e1; box-shadow: none; }
-  .calendar-btn {
-    position: relative; width: 30px; min-width: 30px; height: 28px; padding: 0;
-    border: 0; border-left: 1px solid var(--border); border-radius: 5px;
-    background: transparent; color: #334155;
-    display: inline-flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
-  .calendar-btn:hover { background: #eef2ff; color: var(--accent); }
-  .calendar-btn::before {
-    content: ""; position: absolute; width: 14px; height: 13px;
-    border: 1.6px solid currentColor; border-radius: 3px;
-    left: 8px; top: 7px;
-  }
-  .calendar-btn::after {
-    content: ""; position: absolute; width: 8px; height: 1.6px;
-    background: currentColor; left: 11px; top: 11px;
-    box-shadow: 0 4px 0 currentColor; opacity: .72;
-  }
-  .report-tabs {
-    display: inline-flex; border: 1px solid #cbd5e1; border-radius: 4px; overflow: hidden;
-    margin-bottom: 14px; background: #fff;
-  }
-  .report-tabs button {
-    min-width: 62px; padding: 8px 12px; border: 0; border-right: 1px solid #cbd5e1;
-    background: #fff; color: #334155; font-size: 12px; font-weight: 600; font-family: inherit;
-    cursor: pointer;
-  }
-  .report-tabs button:last-child { border-right: 0; }
-  .report-tabs button.active { background: #0f6f8f; color: #fff; }
-  .quick-table-wrap { overflow-x: auto; }
-  .quick-table { min-width: 620px; border-collapse: collapse; font-size: 13px; }
-  .quick-table th {
-    background: #e5e7eb; color: #334155; font-weight: 700; text-transform: none;
-    letter-spacing: 0; border-bottom: 1px solid #d1d5db;
-  }
-  .quick-table th, .quick-table td { padding: 10px 12px; }
-  .quick-table td:nth-child(2), .quick-table td:nth-child(3), .quick-table td:nth-child(4), .quick-table td:nth-child(5) {
-    color: #0f6f8f; font-weight: 600;
-  }
-
-  .weekly-summary-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .weekly-summary-card { margin-top: 8px; }
+  .weekly-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
   .weekly-summary-card h2 { margin-bottom: 4px; }
   .weekly-range {
     margin-bottom: 12px; color: var(--muted);
@@ -321,7 +259,6 @@
 
   @media (max-width: 1180px) {
     .risk-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); }
-    .dashboard-board { grid-template-columns: 1fr; }
   }
 
   /* ---------- Ticket listesi ---------- */
@@ -646,12 +583,6 @@
     .logout-btn { width: auto; }
     main { margin-left: 0; padding: 20px 14px 60px; }
     .risk-grid { grid-template-columns: 1fr; gap: 14px; }
-    .dashboard-board { grid-template-columns: 1fr; }
-    .quick-report-card, .weekly-summary-card { min-height: auto; }
-    .quick-head { align-items: flex-start; }
-    .report-date-filter { margin-left: 0; }
-    .period-box { width: 128px; min-width: 128px; }
-    .report-tabs { max-width: 100%; overflow-x: auto; }
     .week-stat { grid-template-columns: 38px minmax(0, 1fr) auto; }
     .filters > div { max-width: none; min-width: 100%; }
     .ticket-scope { width: 100%; }
@@ -758,31 +689,10 @@
         <h2>Risk Altındaki Ticketlar</h2>
         <div id="riskCards" class="risk-grid"></div>
       </div>
-      <div class="dashboard-board">
-        <div class="card quick-report-card">
-          <div class="quick-head">
-            <h2>Hızlı Raporlar</h2>
-            <div class="report-date-filter">
-              <span class="period-label">Rapor Tarihi</span>
-              <input id="reportDate" class="period-box" type="date" onchange="loadDashboard()">
-              <button class="calendar-btn" type="button" onclick="setReportDateToday()" aria-label="Güncel tarihe al" title="Güncel tarihe al"></button>
-            </div>
-          </div>
-          <div class="report-tabs">
-            <button id="reportTabType" class="active" onclick="setReportTab('type')">Özet</button>
-            <button id="reportTabManager" onclick="setReportTab('manager')">Sorumlu</button>
-            <button id="reportTabStatus" onclick="setReportTab('status')">Durum</button>
-            <button id="reportTabPriority" onclick="setReportTab('priority')">Öncelik</button>
-          </div>
-          <div class="quick-table-wrap">
-            <table id="quickReportTable" class="quick-table"></table>
-          </div>
-        </div>
-        <div class="card weekly-summary-card">
-          <h2 id="weeklySummaryTitle">Bu Haftalık Ticket Özeti</h2>
-          <div id="weeklySummaryRange" class="weekly-range"></div>
-          <div id="weeklySummary" class="weekly-summary-grid"></div>
-        </div>
+      <div class="card weekly-summary-card">
+        <h2 id="weeklySummaryTitle">Bu Haftalık Ticket Özeti</h2>
+        <div id="weeklySummaryRange" class="weekly-range"></div>
+        <div id="weeklySummary" class="weekly-summary-grid"></div>
       </div>
       <div class="card volume-card">
         <div class="volume-head">
@@ -942,7 +852,7 @@
 
 <script>
 const API = '/api';
-const state = { token: null, username: null, role: null, department: null, profileImage: null, pendingProfileImage: null, page: 0, totalPages: 0, ticketView: 'all', ticketMenuOpen: false, reportTab: 'type', dashboardData: null, auditPage: 0, auditPageSize: 10, auditType: '', editingId: null, holdTicketId: null, openComments: new Set(), ticketsById: {}, assignableUsers: [] };
+const state = { token: null, username: null, role: null, department: null, profileImage: null, pendingProfileImage: null, page: 0, totalPages: 0, ticketView: 'all', ticketMenuOpen: false, dashboardData: null, auditPage: 0, auditPageSize: 10, auditType: '', editingId: null, holdTicketId: null, openComments: new Set(), ticketsById: {}, assignableUsers: [] };
 const cropState = { image: null, x: 0, y: 0, scale: 1, minScale: 1, dragging: false, lastX: 0, lastY: 0 };
 
 /* ---------- yardimcilar ---------- */
@@ -1286,12 +1196,6 @@ function roleLabel(role, department) {
   return role === 'ADMIN' ? 'Yönetici' : deptLabel(department);
 }
 
-function reportPersonLabel(person) {
-  if (!person || !person.username) return 'Atama yok';
-  const detail = person.role ? roleLabel(person.role, person.department) : '';
-  return detail ? `${person.username} - ${detail}` : person.username;
-}
-
 function userInline(username, role, department, profileImage) {
   if (!username) return '<b>—</b>';
   return `<span class="person-line">${avatarHtml(username, profileImage, 'avatar-sm')}<span class="meta-person"><span class="user-main">${esc(username)}</span><span class="user-sub">${roleLabel(role, department)}</span></span></span>`;
@@ -1316,12 +1220,9 @@ async function loadAssignableUsers(force) {
 
 async function loadDashboard() {
   try {
-    const selectedDate = $('reportDate') && $('reportDate').value ? $('reportDate').value : todayIso();
-    const d = await api('/dashboard?reportDate=' + encodeURIComponent(selectedDate));
-    if ($('reportDate')) $('reportDate').value = d.reportDate || selectedDate;
+    const d = await api('/dashboard');
     state.dashboardData = d;
     renderRiskCards(d);
-    renderQuickReports(d);
     renderWeeklySummary(d);
     renderVolumeChart(d);
   } catch (err) { toast(err.message, 'err'); }
@@ -1384,11 +1285,6 @@ function formatIsoDate(iso) {
   return new Date(iso + 'T00:00:00').toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-function setReportDateToday() {
-  if ($('reportDate')) $('reportDate').value = todayIso();
-  loadDashboard();
-}
-
 /* Profesyonel cizgi ikonlar (Feather Icons, MIT lisansli — feathericons.com) */
 const ICONS = {
   pause: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>',
@@ -1411,78 +1307,18 @@ function riskCard(label, value, colorClass, icon) {
     </div>`;
 }
 
+/* Risk kartlari GUNCEL durumu gosterir (tarih filtresine bagli degildir):
+   sistemde su an beklemede / islemde / yuksek oncelikli acik / suresi gecmis
+   olan tum ticket'lar sayilir. */
 function renderRiskCards(d) {
-  const status = d.reportTicketsByStatus || {};
-  const priority = d.reportOpenTicketsByPriority || {};
+  const status = d.ticketsByStatus || {};
+  const priority = d.openTicketsByPriority || {};
   $('riskCards').innerHTML = [
-    riskCard('Bekleyen Ticketlar', status.HOLD || 0, 'risk-orange', 'pause'),
-    riskCard('Yüksek Öncelikli', priority.HIGH || 0, 'risk-red', 'alert'),
-    riskCard('Süresi Geçenler', d.reportOverdueTickets, 'risk-red', 'clock'),
-    riskCard('Devam Eden', d.reportUnresolvedTickets, 'risk-green', 'activity')
+    riskCard('Beklemede', status.HOLD || 0, 'risk-orange', 'pause'),
+    riskCard('İşlemde', status.IN_PROGRESS || 0, 'risk-blue', 'activity'),
+    riskCard('Yüksek Öncelikli Açık', priority.HIGH || 0, 'risk-red', 'alert'),
+    riskCard('Süresi Geçenler', d.overdueTickets || 0, 'risk-red', 'clock')
   ].join('');
-}
-
-function setReportTab(tab) {
-  state.reportTab = tab;
-  renderQuickReports(state.dashboardData);
-}
-
-function syncDashboardTabs() {
-  ['Type', 'Manager', 'Status', 'Priority'].forEach(name => {
-    const el = $('reportTab' + name);
-    if (el) el.classList.toggle('active', state.reportTab === name.toLowerCase());
-  });
-}
-
-function quickRows(d) {
-  const reportStatus = d.reportTicketsByStatus || {};
-  const priority = d.reportTicketsByPriority || d.reportOpenTicketsByPriority || {};
-  if (state.reportTab === 'manager') {
-    return (d.reportAssignees || []).map(s => [
-      reportPersonLabel(s),
-      s.ticketCount,
-      formatIsoDate(d.reportDate),
-      'Atanan',
-      'Seçilen gün açılan ticket'
-    ]);
-  }
-  if (state.reportTab === 'status') {
-    return ['OPEN', 'IN_PROGRESS', 'HOLD', 'DONE'].map(s => [
-      STATUS_TR[s] || s,
-      reportStatus[s] || 0,
-      formatIsoDate(d.reportDate),
-      s === 'DONE' ? '-' : 'Aktif',
-      'Seçilen gün'
-    ]);
-  }
-  if (state.reportTab === 'priority') {
-    return [
-      ['Yüksek Öncelik', priority.HIGH || 0, formatIsoDate(d.reportDate), 'SLA 4 saat', 'Acil'],
-      ['Orta Öncelik', priority.MEDIUM || 0, formatIsoDate(d.reportDate), 'SLA 24 saat', 'Normal'],
-      ['Düşük Öncelik', priority.LOW || 0, formatIsoDate(d.reportDate), 'SLA 72 saat', 'Düşük']
-    ];
-  }
-  return [
-    ['Seçilen Gün Açılan Ticketlar', d.reportOpenedTickets, formatIsoDate(d.reportDate), 'OPEN', 'Yeni talepler'],
-    ['Seçilen Gün Halledilenler', d.reportSolvedTickets, formatIsoDate(d.reportDate), 'DONE', 'Tamamlanan işler'],
-    ['Seçilen Gün Süresi Dolanlar', d.reportOverdueTickets, formatIsoDate(d.reportDate), 'SLA', 'Acil takip'],
-    ['Seçilen Gün Beklemedekiler', reportStatus.HOLD || 0, formatIsoDate(d.reportDate), 'HOLD', 'Beklemede']
-  ];
-}
-
-function renderQuickReports(d) {
-  if (!d) return;
-  syncDashboardTabs();
-  const firstHeader = {
-    type: 'Tür',
-    manager: 'Sorumlu',
-    status: 'Durum',
-    priority: 'Öncelik'
-  }[state.reportTab] || 'Tür';
-  const rows = quickRows(d);
-  $('quickReportTable').innerHTML = `
-    <tr><th>${firstHeader}</th><th>Adet</th><th>Rapor<br>Tarihi</th><th>Durum</th><th>Açıklama</th></tr>
-    ${rows.length ? rows.map(row => `<tr>${row.map(cell => `<td>${esc(cell)}</td>`).join('')}</tr>`).join('') : '<tr><td colspan="5" class="empty">Seçilen tarihte kayıt yok.</td></tr>'}`;
 }
 
 function weeklySummaryCard(title, value, meta, colorClass, icon) {
