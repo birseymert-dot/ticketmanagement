@@ -32,6 +32,23 @@ public class AuthServiceImpl implements AuthService {
      */
     private static final Pattern EMAIL_FORMAT = Pattern.compile(
             "^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.[A-Za-z]{2,}$");
+
+    /**
+     * Bilinen e-posta saglayicilarinin gecerli alan adlari.
+     * "ems@gmail.cc" gibi bilinen saglayici adini tasiyan ama uzantisi
+     * hatali olan adresler reddedilir. Listede olmayan alan adlari
+     * (ornegin kurumsal domainler) format kontrolunden gectigi surece kabul edilir.
+     */
+    private static final java.util.Map<String, java.util.Set<String>> KNOWN_PROVIDERS = java.util.Map.of(
+            "gmail", java.util.Set.of("gmail.com"),
+            "hotmail", java.util.Set.of("hotmail.com"),
+            "outlook", java.util.Set.of("outlook.com", "outlook.com.tr"),
+            "yahoo", java.util.Set.of("yahoo.com", "yahoo.com.tr"),
+            "icloud", java.util.Set.of("icloud.com"),
+            "yandex", java.util.Set.of("yandex.com", "yandex.com.tr", "yandex.ru"),
+            "proton", java.util.Set.of("proton.me", "protonmail.com"),
+            "protonmail", java.util.Set.of("protonmail.com", "proton.me")
+    );
     private static final Pattern PROFILE_IMAGE_FORMAT = Pattern.compile(
             "^data:image/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=\\r\\n]+$",
             Pattern.CASE_INSENSITIVE);
@@ -62,6 +79,7 @@ public class AuthServiceImpl implements AuthService {
         String email = canonical(request.getEmail());
 
         validateEmailFormat(email);
+        validateEmailProvider(email);
         if (request.getDepartment() == null) {
             throw new BadRequestException("Departman secimi zorunludur");
         }
@@ -134,6 +152,20 @@ public class AuthServiceImpl implements AuthService {
     private void validateEmailFormat(String email) {
         if (email == null || !EMAIL_FORMAT.matcher(email).matches()) {
             throw new BadRequestException("Email adresi hatali");
+        }
+    }
+
+    /** Bilinen saglayicilar icin alan adi dogrulamasi (is kurali, service katmaninda). */
+    private void validateEmailProvider(String email) {
+        String domain = email.substring(email.indexOf('@') + 1).toLowerCase();
+        String provider = domain.split("\\.")[0];
+
+        java.util.Set<String> validDomains = KNOWN_PROVIDERS.get(provider);
+        if (validDomains != null && !validDomains.contains(domain)) {
+            String beklenen = String.join(" veya ",
+                    validDomains.stream().map(d -> "@" + d).sorted().toList());
+            throw new BadRequestException(
+                    "Email adresi hatali: " + provider + " adresleri " + beklenen + " ile bitmelidir");
         }
     }
 
